@@ -1,0 +1,49 @@
+﻿INVENTORY:
+	8x L-bracket
+	20x L-bracket screws
+	20x lid screws
+	1x jack plug
+	0x board
+	0x Arduino Nano
+	2x DRV8825
+	5x 1A motor
+	30x motor pins
+	2x motor pins cable
+	30x capacitors
+	0x pulley
+	0x timing belt
+	1x box
+	0x lid
+
+ON-ROUTE:
+	15x board (must arrive till 11.1.2018)
+	6x DRV8825 (must arrive till 9.1.2018)
+	5x Arduino Nano (must arrive till 29.12.2017 ---> SELLER MESSAGE SENT)
+	5x Arduino Nano (must arrive till 24.1.2018)
+	20x board (must arrive till 18.1.2018)
+	20x L-bracket screws (must arrive till 15.1.2018)
+	200x plastic screws (must arrive till 9.1.2018)
+	3x Nema14 DIY CNC Router Stepping Stepper Motor 34mm 0.8A (must arrive till 17.1.2018)
+	30x jack plug (must arrive till 16.2.2018)
+	100x L-bracket screws (must arrive till 9.2.2018)
+	50x timing belt (must arrive till 25.1.2018)
+	
+NEED TO ORDER:
+	5x Arduino nano
+	5x jack plug
+	8x timing belt
+	8x pulley
+
+PREPARED:
+	3/8 chipset
+	3/8 box
+	3/8 motor
+	3/8 box
+	3/8 pulley
+	0/8 belt
+	0/8 lid
+
+TESTED:
+	
+
+SOLD:

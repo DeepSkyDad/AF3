@@ -1,0 +1,667 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <title>Deep Sky Dad AF1 v1.2.0</title>
+
+    <style type="text/css">
+        html {
+            font-family: sans-serif;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            margin: 10px;
+        }
+
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        hgroup,
+        main,
+        nav,
+        section,
+        summary {
+            display: block;
+        }
+
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+
+        audio,
+        canvas,
+        progress,
+        video {
+            display: inline-block;
+            vertical-align: baseline;
+        }
+
+            audio:not([controls]) {
+                display: none;
+                height: 0;
+            }
+
+        [hidden],
+        template {
+            display: none;
+        }
+
+        a {
+            background: transparent;
+        }
+
+            a:active,
+            a:hover {
+                outline: 0;
+            }
+
+        abbr[title] {
+            border-bottom: 1px dotted;
+        }
+
+        b,
+        strong {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        dfn {
+            font-style: italic;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 0.67em 0;
+        }
+
+        mark {
+            background: #ff0;
+            color: #000;
+        }
+
+        small {
+            font-size: 80%;
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+        }
+
+        sup {
+            top: -0.5em;
+        }
+
+        sub {
+            bottom: -0.25em;
+        }
+
+        img {
+            border: 0;
+        }
+
+        svg:not(:root) {
+            overflow: hidden;
+        }
+
+        figure {
+            margin: 1em 40px;
+        }
+
+        hr {
+            -moz-box-sizing: content-box;
+            box-sizing: content-box;
+            height: 0;
+        }
+
+        pre {
+            overflow: auto;
+        }
+
+        code,
+        kbd,
+        pre,
+        samp {
+            font-family: monospace, monospace;
+            font-size: 1em;
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            color: inherit;
+            font: inherit;
+            margin: 0;
+        }
+
+        button {
+            overflow: visible;
+        }
+
+        button,
+        select {
+            text-transform: none;
+        }
+
+        button,
+        html input[type="button"],
+        input[type="reset"],
+        input[type="submit"] {
+            -webkit-appearance: button;
+            cursor: pointer;
+        }
+
+        .button {
+            position: relative;
+            display: inline-block;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 7px 14px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            background-color: transparent;
+            color: inherit;
+            vertical-align: middle;
+            text-align: center;
+            text-decoration: none;
+            text-transform: none;
+            white-space: normal;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 13px;
+            font-family: "OpenSansSemiBold", Helvetica, Arial, sans-serif;
+            line-height: 20px;
+            cursor: pointer;
+            -webkit-transition: all 0.15s ease;
+            transition: all 0.15s ease;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-appearance: none;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+            .button:hover,
+            .button:focus {
+                outline: 0;
+                text-decoration: none;
+            }
+
+            .button:active,
+            .button.is-active {
+                -webkit-box-shadow: none;
+                box-shadow: none;
+                text-decoration: none;
+            }
+
+            .button[disabled],
+            .button.is-disabled {
+                opacity: 0.7;
+                filter: alpha(opacity=70);
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            .button.is-default {
+                border-color: #656d78;
+                background-color: #f5f7fa;
+                color: #434a54;
+            }
+
+                .button.is-default:hover,
+                .button.is-default:focus {
+                    border-color: #737c89;
+                    background-color: white;
+                }
+
+                .button.is-default:active,
+                .button.is-default.is-active {
+                    border-color: #575e67;
+                    background-color: #e1e7f0;
+                }
+
+            .button.gtd {
+                border-color: #747474;
+                font-size: 1.4em;
+                background-color: #a7a7a7;
+                font-weight: bold;
+                color: white;
+                border-radius: 4px;
+                margin-right: 0;
+                border: 2px solid rgba(0, 0, 0, 0.3);
+                border-radius: 4px;
+            }
+
+                .button.gtd:hover,
+                .button.gtd:focus {
+                    border-color: #93261b;
+                    font-size: 1.4em;
+                    background-color: #d33727;
+                    font-weight: bold;
+                    color: white;
+                    border-radius: 4px;
+                    margin-right: 0;
+                    border: 2px solid rgba(0, 0, 0, 0.3);
+                    border-radius: 4px;
+                }
+
+
+        #browse {
+            border-color: #747474;
+            font-size: 0.9em;
+            background-color: #a7a7a7;
+            font-weight: bold;
+            color: white;
+            border-radius: 4px;
+            margin-right: 0;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+
+        #cr {
+            border-color: #747474;
+            font-size: 1.4em;
+            background-color: #a7a7a7;
+            font-weight: bold;
+            color: white;
+            border-radius: 4px;
+            margin-right: 0;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        #set {
+            font-size: 1em;
+            color: #747474;
+            margin-right: 0;
+        }
+
+        table {
+            align: center;
+            table-layout: fixed;
+            width: 500px;
+        }
+
+        th, td {
+            align: center;
+            overflow: hidden;
+            width: 500px;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            vertical-align: middle;
+            position: relative;
+            bottom: -4px;
+            border-color: #747474;
+            font-weight: bold;
+            color: white;
+            border-radius: 4px;
+            margin-right: 0;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        input[type=radio] {
+            bottom: 2px;
+        }
+        /* align checkboxes, radios, text inputs with their label */
+        input[type="radio"] {
+            vertical-align: text-bottom;
+            bottom: -9px;
+            border-color: #747474;
+            font-weight: bold;
+            color: white;
+            border-radius: 4px;
+            margin-right: 0;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        input[type="checkbox"] {
+            vertical-align: bottom;
+            *vertical-align: baseline;
+        }
+
+        .ie6 input {
+            vertical-align: text-bottom;
+        }
+
+        button[disabled],
+        html input[disabled] {
+            cursor: default;
+        }
+
+        button::-moz-focus-inner,
+        input::-moz-focus-inner {
+            border: 0;
+            padding: 0;
+        }
+
+        input {
+            line-height: normal;
+        }
+
+            input[type="checkbox"],
+            input[type="radio"] {
+                box-sizing: border-box;
+                padding: 0;
+            }
+
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                height: auto;
+            }
+
+            input[type="search"] {
+                -webkit-appearance: textfield;
+                -moz-box-sizing: content-box;
+                -webkit-box-sizing: content-box;
+                box-sizing: content-box;
+            }
+
+                input[type="search"]::-webkit-search-cancel-button,
+                input[type="search"]::-webkit-search-decoration {
+                    -webkit-appearance: none;
+                }
+
+        fieldset {
+            border: 1px solid #c0c0c0;
+            margin: 0 2px;
+            padding: 0.35em 0.625em 0.75em;
+        }
+
+        legend {
+            border: 0;
+            padding: 0;
+        }
+
+        textarea {
+            overflow: auto;
+        }
+
+        optgroup {
+            font-weight: bold;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            text-align: center;
+        }
+
+        td,
+        th {
+            padding: 0;
+        }
+
+        /* COLORS */
+        [class*="grid-"] {
+            float: left;
+            margin-bottom: 1.25em;
+        }
+
+            [class*="grid-"] > div {
+                margin: 0 0.625em;
+            }
+
+        /*	SMALL SCREENS	--------------------------------------------- */
+        .grid-1 {
+            width: 100%;
+        }
+
+        .grid-1-2 {
+            width: 100%;
+        }
+
+        .grid-2-3 {
+            width: 100%;
+        }
+
+        .grid-1-3 {
+            width: 100%;
+        }
+
+        .grid-1-4 {
+            width: 50%;
+        }
+
+        .grid-3-4 {
+            width: 50%;
+        }
+
+        /*	MEDIUM SCREENS	--------------------------------------------- */
+        @media only screen and (min-width: 720px) {
+            .grid-1 {
+                width: 100%;
+            }
+
+            .grid-1-2 {
+                width: 50%;
+            }
+
+            .grid-2-3 {
+                width: 66.66%;
+            }
+
+            .grid-1-3 {
+                width: 33.33%;
+            }
+
+            .grid-1-4 {
+                width: 50%;
+            }
+
+            .grid-3-4 {
+                width: 50%;
+            }
+        }
+        /*	BIG SCREENS	--------------------------------------------- */
+        @media only screen and (min-width: 960px) {
+            .grid-1 {
+                width: 100%;
+            }
+
+            .grid-1-2 {
+                width: 50%;
+            }
+
+            .grid-2-3 {
+                width: 66.66%;
+            }
+
+            .grid-1-3 {
+                width: 33.33%;
+            }
+
+            .grid-1-4 {
+                width: 25%;
+            }
+
+            .grid-3-4 {
+                width: 75%;
+            }
+        }
+        /*	IMAGES	--------------------------------------------- */
+        img {
+            width: 50%;
+            max-width: 50%;
+            height: auto;
+        }
+
+        /*	VIDEO	--------------------------------------------- */
+        .video-box {
+            padding-top: 56.25%;
+            position: relative;
+            background-color: #0FF;
+        }
+
+        video, iframe, embed {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /*	TEXT	--------------------------------------------- */
+        a {
+            color: #d33727;
+            text-decoration: underline;
+        }
+
+            a:hover {
+                text-decoration: none;
+            }
+
+            a:active {
+                color: #d33727;
+            }
+
+            a:visited {
+                color: #d33727;
+            }
+
+        .center {
+            text-align: center;
+        }
+
+        .white {
+            color: #FFF;
+        }
+
+        p {
+            margin: 0 0 1.5em 0;
+        }
+
+        ul, ol {
+            margin-left: 1.5em;
+        }
+
+        ul {
+            list-style-type: disc;
+        }
+
+        aside ul {
+            margin: 1em 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+            aside ul li {
+                margin-bottom: 0.75em;
+            }
+
+        abbr {
+            text-transform: lowercase;
+            font-variant: small-caps;
+            letter-spacing: 0.1em;
+            cursor: help;
+        }
+
+        sub, sup {
+            vertical-align: baseline;
+            position: relative;
+            font-size: 65%;
+            line-height: 0;
+        }
+
+        sub {
+            bottom: -0.25em;
+        }
+
+        sup {
+            top: -0.75em;
+        }
+
+        blockquote {
+            margin: 1.5em 0 1.5em 1.80203em;
+            color: #5a5a5a;
+            position: relative;
+        }
+
+            blockquote:before {
+                -webkit-font-smoothing: antialiased;
+                color: #8c8c8c;
+                font-size: 3.60406em;
+                position: absolute;
+                font-weight: bold;
+                content: "\201C";
+                line-height: 1em;
+                left: -0.60180em;
+                top: 0;
+            }
+
+        h1, h2, h3, h4, h5, h6 {
+            text-rendering: optimizeLegibility;
+            font-weight: normal;
+        }
+
+        h1 {
+            margin: 0 0 .45em;
+            line-height: 1.2em;
+            font-size: 1.6em;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin: 0 0 .5em 0;
+            line-height: 1.4em;
+        }
+
+        h3 {
+            margin: 1.95em 0 .19em;
+            line-height: 1.5em;
+            font-size: 1.2em;
+        }
+
+        h4 {
+            line-height: 1.12382em;
+            margin: 3em 0 .45em;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        h5 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1em;
+            margin: 2.75em 0 .35em;
+            font-size: 1.2em;
+        }
+
+        h6 {
+            margin: 0 0 .6em;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body lang="en-GB" dir="LTR">
+    <h1><strong>ASCOM Focuser driver</strong> for <strong>DSD AF1 v1.2.0</strong></h1>
+    <p class="note">
+        <img src="readme.jpg" style="width:1024px;"><br>
+        <br>
+		<b>Compatible with firmware v1.2.0 or higher!</b><br/><br/>
+		For more, check out <a target="_blank" href="https://deepskydad.com/autofocuser">autofocuser website</a> or <a target="_blank" href="https://deepskydad.com/autofocuser/faq">FAQ</a>.
+		<br/><br/>
+		This project is open sourced under MIT license and available on the <a target="_blank" href="https://github.com/DeepSkyDad/AF1">Github</a>.
+    </p>
+</body>
+</html>
