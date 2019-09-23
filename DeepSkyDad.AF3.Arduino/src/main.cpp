@@ -27,6 +27,7 @@
 #include <EEPROMEx.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <TMCStepper.h>
 
 #define EEPROM_AF_STATE_POSITION 0
 #define EEPROM_AF_STATE_MAX_POSITION 1
@@ -84,6 +85,7 @@ bool _eepromSaveAfState;
 
 OneWire _ds = OneWire(HC_PIN);
 DallasTemperature _sensors = DallasTemperature(&_ds);
+TMC2208Stepper _driver = TMC2208Stepper(11, 12, 0.11, true);
 
 bool _hcConnected;
 bool _tsConnected;
@@ -115,27 +117,6 @@ int _commandParamLength;
 
 const char firmwareName[] = "DeepSkyDad.AF3";
 const char firmwareVersion[] = "1.0.0";
-
-int main( void )
-{
-  init();
-
-  //https://forum.arduino.cc/index.php?topic=430814.0
-  //initVariant();
-
-  #if defined(USBCON)
-    USBDevice.attach();
-  #endif
-	
-	setup();
-    
-	for (;;) {
-		loop();
-    if (serialEventRun) serialEventRun();
-	}
-        
-	return 0;
-}
 
 /* EEPROM functions */
 bool eepromValidateChecksum()
@@ -342,7 +323,7 @@ void stopMotor()
 
 void writeStepMode(int stepMode)
 {
-  if (stepMode == 2)
+  /*if (stepMode == 2)
   {
     digitalWrite(TMC220X_PIN_MS1, 1);
     digitalWrite(TMC220X_PIN_MS2, 0);
@@ -362,7 +343,8 @@ void writeStepMode(int stepMode)
     digitalWrite(TMC220X_PIN_MS1, 1);
     digitalWrite(TMC220X_PIN_MS2, 1);
     stepMode = 16;
-  }
+  }*/
+  _driver.microsteps(stepMode);
 
   _eepromAfState[EEPROM_AF_STATE_STEP_MODE] = stepMode;
 }
@@ -370,7 +352,7 @@ void writeStepMode(int stepMode)
 void setStepMode(char param[])
 {
   long sm = strtol(param, NULL, 10);
-  if (sm != 2 && sm != 4 && sm != 8 && sm != 16)
+  if (sm != 2 && sm != 4 && sm != 8 && sm != 16 && sm != 32 && sm != 64 && sm != 128 && sm != 256)
   {
     return;
   }
@@ -513,11 +495,11 @@ void autoDiscovery()
     if (!_hcConnected)
     {
       x = readHcPin();
-      Serial.println(x);
+      //Serial.println(x);
       if (x < HC_CONNECTED_MAX && x > HC_CONNECTED_MIN)
       {
         _hcConnected = true;
-        Serial.println("HC detected!");
+        //Serial.println("HC detected!");
       }
     }
 
@@ -847,12 +829,14 @@ void executeCommand()
     _eepromSaveAfState = true;
     printSuccess();
   }
-   else if (strcmp("SENA", _command) == 0)
+  else if (strcmp("UART", _command) == 0)
   {
-    digitalWrite(TMC220X_PIN_ENABLE, strtol(_commandParam, NULL, 10));
-    printSuccess();
+    
+
+  
+    return;
   }
-     else if (strcmp("GTMC", _command) == 0)
+  else if (strcmp("GTMC", _command) == 0)
   {
     printResponse(_temperatureCelsius);
   }
@@ -923,6 +907,32 @@ void setup()
   _motorLastMoveEepromMs = 0L;
 
   _sensors.begin();
+
+  _driver.begin();
+    
+    uint8_t result = _driver.test_connection();
+    if (result) {
+        Serial.println(F("failed!"));
+        Serial.print(F("Likely cause: "));
+        switch(result) {
+            case 1: Serial.println(F("loose connection")); break;
+            case 2: Serial.println(F("Likely cause: no power")); break;
+        }
+        return;
+    }
+    Serial.println(F("OK"));
+    
+    _driver.pdn_disable(true); //enable UART
+    //_driver.rms_current(0.44, 0.5);
+    _driver.irun(10); //10/32 * 1.4A = 0.44A
+    _driver.ihold(5); //10/32 * 1.4A = 0.22A
+    _driver.mstep_reg_select(true); //enable microstep selection over UART
+    _driver.I_scale_analog(false); //disable Vref scaling
+    _driver.microsteps(16); //select microsteps (0,2,4,8,16,32,64,128,256)
+    _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
+    _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
+    _driver.intpol(true); //use interpolation
+    _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
 }
 unsigned long test = millis();
 void loop()
