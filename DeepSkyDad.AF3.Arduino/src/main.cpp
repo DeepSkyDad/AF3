@@ -49,7 +49,7 @@ int _eepromAfStateAdressesCount = EEPROMSizeATmega328 / _eepromAfStateAddressSiz
 int _eepromAfStateCurrentAddress;
 bool _eepromSaveAfState;
 
-/* TMC2208 pins */
+/* TMC2208 */
 #define TMC220X_PIN_ENABLE 9
 #define TMC220X_PIN_DIR 2
 #define TMC220X_PIN_STEP 3
@@ -58,14 +58,16 @@ bool _eepromSaveAfState;
 #define TMC220X_PIN_UART_RX 11
 #define TMC220X_PIN_UART_TX 12
 
+TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX, 0.11, true);
+
 /* MOTOR SELECT */
-#define MOTOR_SELECT_A 5
-#define MOTOR_SELECT_B 6
+#define MOTOR_SELECT_PIN_A 5
+#define MOTOR_SELECT_PIN_B 6
 #define MOTOR_I_14HS10_0404S_04A 300
 #define MOTOR_I_14HS17_0504S_05A 440
 #define MOTOR_I_HOLD_MULTIPLYER 0.5 //TODO: read from eeprom
 
-/* HAND CONTROLLER */
+/* HAND CONTROLLER/TEMPERATURE SENSOR */
 
 #define HC_PIN A0
 
@@ -94,7 +96,6 @@ bool _eepromSaveAfState;
 
 OneWire _ds = OneWire(HC_PIN);
 DallasTemperature _sensors = DallasTemperature(&_ds);
-TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX, 0.11, true);
 
 bool _hcConnected;
 bool _tsConnected;
@@ -288,6 +289,8 @@ void setTargetPosition(long pos) {
     printSuccess();
   }
 }
+
+/* MOTOR FUNCTIONS */
 
 void startMotor() {
   Serial.println("START MOTOR");
@@ -882,35 +885,25 @@ void setup()
   pinMode(TMC220X_PIN_MS1, OUTPUT);
   pinMode(TMC220X_PIN_MS2, OUTPUT);
   pinMode(TMC220X_PIN_ENABLE, OUTPUT);
-  pinMode(MOTOR_SELECT_A, INPUT);
-  pinMode(MOTOR_SELECT_B, INPUT);
+  pinMode(MOTOR_SELECT_PIN_A, INPUT);
+  pinMode(MOTOR_SELECT_PIN_B, INPUT);
   pinMode(A0, INPUT);
 
   digitalWrite(TMC220X_PIN_DIR, LOW);
   digitalWrite(TMC220X_PIN_STEP, LOW);
   digitalWrite(TMC220X_PIN_ENABLE, HIGH);
   
-
   _motorTargetPosition = _eepromAfState[EEPROM_AF_STATE_POSITION];
   _motorSettleBufferPrevMs = 0L;
   _motorLastMoveEepromMs = 0L;
 
+  //TEMPERATURE SENSOR
   _sensors.begin();
 
-delay(3000);
-
-  _driver.begin();
-    
-  uint8_t result = _driver.test_connection();
-  if (result) {
-       Serial.println("UART failed");
-      return;
-  }
-
-
+  //MOTOR SELECTION HEADERS
   float motorI = MOTOR_I_14HS10_0404S_04A;
-  int a = digitalRead(MOTOR_SELECT_A);
-  int b = digitalRead(MOTOR_SELECT_B);
+  int a = digitalRead(MOTOR_SELECT_PIN_A);
+  int b = digitalRead(MOTOR_SELECT_PIN_B);
   
   if(a == HIGH && b == HIGH) {
     motorI = MOTOR_I_14HS10_0404S_04A;
@@ -922,6 +915,16 @@ delay(3000);
     //TODO
   } else if(a == LOW && b == LOW) {
     //TODO
+  }
+
+  //UART
+  _driver.begin();
+
+  //TODO: do lazy loading or something similar if initial UART fails... 
+  uint8_t result = _driver.test_connection();
+  if (result) {
+       Serial.println("UART failed");
+      return;
   }
   
   _driver.pdn_disable(true); //enable UART
@@ -935,7 +938,7 @@ delay(3000);
   _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
   digitalWrite(TMC220X_PIN_ENABLE, LOW);
 }
-unsigned long test = millis();
+
 void loop()
 { 
   if (_motorIsMoving)
