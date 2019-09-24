@@ -55,6 +55,15 @@ bool _eepromSaveAfState;
 #define TMC220X_PIN_STEP 3
 #define TMC220X_PIN_MS2 7
 #define TMC220X_PIN_MS1 8
+#define TMC220X_PIN_UART_RX 11
+#define TMC220X_PIN_UART_TX 12
+
+/* MOTOR SELECT */
+#define MOTOR_SELECT_A 5
+#define MOTOR_SELECT_B 6
+#define MOTOR_I_14HS10_0404S_04A 300
+#define MOTOR_I_14HS17_0504S_05A 440
+#define MOTOR_I_HOLD_MULTIPLYER 0.5 //TODO: read from eeprom
 
 /* HAND CONTROLLER */
 
@@ -85,7 +94,7 @@ bool _eepromSaveAfState;
 
 OneWire _ds = OneWire(HC_PIN);
 DallasTemperature _sensors = DallasTemperature(&_ds);
-TMC2208Stepper _driver = TMC2208Stepper(11, 12, 0.11, true);
+TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX, 0.11, true);
 
 bool _hcConnected;
 bool _tsConnected;
@@ -321,45 +330,23 @@ void stopMotor()
   _motorTargetPosition = _eepromAfState[EEPROM_AF_STATE_POSITION];
 }
 
-void writeStepMode(int stepMode)
+void writeStepMode(int sm)
 {
-  /*if (stepMode == 2)
+  //select microsteps (0,2,4,8,16,32,64,128,256)
+  if (sm != 0 && sm != 2 && sm != 4 && sm != 8 && sm != 16 && sm != 32 && sm != 64 && sm != 128 && sm != 256)
   {
-    digitalWrite(TMC220X_PIN_MS1, 1);
-    digitalWrite(TMC220X_PIN_MS2, 0);
+    return;
   }
-  else if (stepMode == 4)
-  {
-    digitalWrite(TMC220X_PIN_MS1, 0);
-    digitalWrite(TMC220X_PIN_MS2, 1);
-  }
-  else if (stepMode == 8)
-  {
-    digitalWrite(TMC220X_PIN_MS1, 0);
-    digitalWrite(TMC220X_PIN_MS2, 0);
-  }
-  else
-  {
-    digitalWrite(TMC220X_PIN_MS1, 1);
-    digitalWrite(TMC220X_PIN_MS2, 1);
-    stepMode = 16;
-  }*/
-  _driver.microsteps(stepMode);
 
-  _eepromAfState[EEPROM_AF_STATE_STEP_MODE] = stepMode;
+  _driver.microsteps(sm); 
+
+  _eepromAfState[EEPROM_AF_STATE_STEP_MODE] = sm;
 }
 
 void setStepMode(char param[])
 {
   long sm = strtol(param, NULL, 10);
-  if (sm != 2 && sm != 4 && sm != 8 && sm != 16 && sm != 32 && sm != 64 && sm != 128 && sm != 256)
-  {
-    return;
-  }
-  else
-  {
-    writeStepMode(sm);
-  }
+  writeStepMode(sm);
 }
 
 void setSpeedMode(char param[])
@@ -867,7 +854,7 @@ void executeCommand()
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial)
   {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -895,12 +882,14 @@ void setup()
   pinMode(TMC220X_PIN_MS1, OUTPUT);
   pinMode(TMC220X_PIN_MS2, OUTPUT);
   pinMode(TMC220X_PIN_ENABLE, OUTPUT);
+  pinMode(MOTOR_SELECT_A, INPUT);
+  pinMode(MOTOR_SELECT_B, INPUT);
   pinMode(A0, INPUT);
 
   digitalWrite(TMC220X_PIN_DIR, LOW);
   digitalWrite(TMC220X_PIN_STEP, LOW);
-  digitalWrite(TMC220X_PIN_ENABLE, LOW);
-  writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
+  digitalWrite(TMC220X_PIN_ENABLE, HIGH);
+  
 
   _motorTargetPosition = _eepromAfState[EEPROM_AF_STATE_POSITION];
   _motorSettleBufferPrevMs = 0L;
@@ -908,31 +897,43 @@ void setup()
 
   _sensors.begin();
 
+delay(3000);
+
   _driver.begin();
     
-    uint8_t result = _driver.test_connection();
-    if (result) {
-        Serial.println(F("failed!"));
-        Serial.print(F("Likely cause: "));
-        switch(result) {
-            case 1: Serial.println(F("loose connection")); break;
-            case 2: Serial.println(F("Likely cause: no power")); break;
-        }
-        return;
-    }
-    Serial.println(F("OK"));
-    
-    _driver.pdn_disable(true); //enable UART
-    //_driver.rms_current(0.44, 0.5);
-    _driver.irun(10); //10/32 * 1.4A = 0.44A
-    _driver.ihold(5); //10/32 * 1.4A = 0.22A
-    _driver.mstep_reg_select(true); //enable microstep selection over UART
-    _driver.I_scale_analog(false); //disable Vref scaling
-    _driver.microsteps(16); //select microsteps (0,2,4,8,16,32,64,128,256)
-    _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
-    _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
-    _driver.intpol(true); //use interpolation
-    _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
+  uint8_t result = _driver.test_connection();
+  if (result) {
+       Serial.println("UART failed");
+      return;
+  }
+
+
+  float motorI = MOTOR_I_14HS10_0404S_04A;
+  int a = digitalRead(MOTOR_SELECT_A);
+  int b = digitalRead(MOTOR_SELECT_B);
+  
+  if(a == HIGH && b == HIGH) {
+    motorI = MOTOR_I_14HS10_0404S_04A;
+    Serial.println("MOTOR_I_14HS10_0404S_04A");
+  } else if(a == HIGH && b == LOW) {
+    motorI = MOTOR_I_14HS17_0504S_05A;
+    Serial.println("MOTOR_I_14HS17_0504S_05A");
+  } else if(a == LOW && b == HIGH) {
+    //TODO
+  } else if(a == LOW && b == LOW) {
+    //TODO
+  }
+  
+  _driver.pdn_disable(true); //enable UART
+  _driver.rms_current(motorI, MOTOR_I_HOLD_MULTIPLYER);
+  _driver.mstep_reg_select(true); //enable microstep selection over UART
+  _driver.I_scale_analog(false); //disable Vref scaling
+  writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
+  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
+  _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
+  _driver.intpol(true); //use interpolation
+  _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
+  digitalWrite(TMC220X_PIN_ENABLE, LOW);
 }
 unsigned long test = millis();
 void loop()
