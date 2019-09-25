@@ -668,7 +668,7 @@ void printResponseErrorCode(int code)
 
 void executeCommand()
 {
-  if(!!_motorUARTInitialized) {
+  if(!_motorUARTInitialized) {
     printResponseErrorCode(999);
     return;
   }
