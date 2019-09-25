@@ -848,9 +848,6 @@ void executeCommand()
   }
   else if (strcmp("DEBG", _command) == 0)
   {
-//{<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIHoldMultiplier>, <checksum>}
-
-
     Serial.print("Memory address: ");
     Serial.println(_eepromAfStateCurrentAddress);
     Serial.print("Motor current (mA): ");
