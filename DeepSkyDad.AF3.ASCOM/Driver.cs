@@ -26,27 +26,22 @@
 // unused code canbe deleted and this definition removed.
 #define Focuser
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Runtime.InteropServices;
-
-using ASCOM;
-using ASCOM.Astrometry;
 using ASCOM.Astrometry.AstroUtils;
-using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
-using System.Globalization;
+using ASCOM.Utilities;
+using System;
 using System.Collections;
+using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace ASCOM.DeepSkyDad.AF1
+namespace ASCOM.DeepSkyDad.AF3
 {
     //
-    // Your driver's DeviceID is ASCOM.DeepSkyDad.AF1.Focuser
+    // Your driver's DeviceID is ASCOM.DeepSkyDad.AF3.Focuser
     //
-    // The Guid attribute sets the CLSID for ASCOM.DeepSkyDad.AF1.Focuser
+    // The Guid attribute sets the CLSID for ASCOM.DeepSkyDad.AF3.Focuser
     // The ClassInterface/None addribute prevents an empty interface called
     // _DeepSkyDad from being created and used as the [default] interface
     //
@@ -55,9 +50,9 @@ namespace ASCOM.DeepSkyDad.AF1
     //
 
     /// <summary>
-    /// DSD AF1
+    /// DSD AF3
     /// </summary>
-    [Guid("10cc53ba-ec1f-4cca-8e95-62aa97be4f96")]
+    [Guid("13d23dd8-c0a2-495f-a9a2-b2573c231e0e")]
     [ClassInterface(ClassInterfaceType.None)]
     public partial class Focuser : IFocuserV2
     {
@@ -65,47 +60,43 @@ namespace ASCOM.DeepSkyDad.AF1
         /// ASCOM DeviceID (COM ProgID) for this driver.
         /// The DeviceID is used by ASCOM applications to load the driver at runtime.
         /// </summary>
-        internal static string driverID = "ASCOM.DeepSkyDad.AF1.Focuser";
+        internal static string driverID = "ASCOM.DeepSkyDad.AF3.Focuser";
         // TODO Change the descriptive string for your driver then remove this line
         /// <summary>
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
-        private static string driverDescription = "ASCOM Deep Sky Dad AF1";
+        private static string driverDescription = "ASCOM Deep Sky Dad AF3";
 
-        private static string firmwareVersion = "Board=DeepSkyDad.AF1, Version=1.2";
+        private static string firmwareVersion = "Board=DeepSkyDad.AF3, Version=1.0";
 
-        internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
-        internal static string comPortDefault = "COM10";
+        internal static string comPortProfileName = "COM Port";
+        internal static string comPortDefault = "COM1";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
         internal static string stepSizeProfileName = "Step size";
         internal static string stepSizeDefault = "1/2";
         internal static string speedModeProfileName = "Speed mode";
-        internal static string speedModeDefaultValue = "High";
+        internal static string speedModeDefaultValue = "Medium";
         internal static string maxPositionProfileName = "Maximum positions";
-        internal static string maxPositionDefault = "100000";
+        internal static string maxPositionDefault = "1000000";
         internal static string maxMovementProfileName = "Maximum movement";
-        internal static string maxMovementDefault = "5000";
+        internal static string maxMovementDefault = "50000";
         internal static string resetOnConnectProfileName = "Reset on connect";
         internal static string resetOnConnectDefault = "false";
         internal static string setPositonOnConnectProfileName = "Set position on connect";
         internal static string setPositonOnConnectDefault = "false";
         internal static string setPositonOnConnectValueProfileName = "Set position on connect value";
-        internal static string setPositonOnConnectValueDefault = "50000";
-        internal static string coilsModeProfileName = "Coils mode";
-        internal static string coilsModeDefault = "Always on";
-        internal static string idleCoilsTimeoutProfileName = "Idle - coils timeout (ms)";
-        internal static string idleCoilsTimeoutDefault = "60000";
+        internal static string setPositonOnConnectValueDefault = "500000";
         internal static string settleBufferProfileName = "Settle buffer";
         internal static string settleBufferDefault = "0";
         internal static string reverseDirectionProfileName = "Reverse direction";
         internal static string reverseDirectionDefault = "false";
-        internal static string currentMoveProfileName = "Current - move";
-        internal static string currentMoveDefault = "75%";
-        internal static string currentHoldProfileName = "Current - hold";
-        internal static string currentHoldDefault = "50%";
+        internal static string motorHoldCurrentMultiplierName = "Hold current multiplier (%)";
+        internal static string motorHoldCurrentMultiplierDefault = "50";
+        internal static string temperatureCompensationProfileName = "Temperature compensation";
+        internal static string temperatureCompensationDefault = "false";
 
-        internal static string comPort; // Variables to hold the currrent device configuration
+        internal static string comPort;
         internal static int maxPosition;
         internal static int maxMovement;
         internal static string stepSize;
@@ -114,12 +105,10 @@ namespace ASCOM.DeepSkyDad.AF1
         internal static bool resetOnConnect;
         internal static bool setPositonOnConnect;
         internal static int setPositionOnConnectValue;
-        internal static string coilsMode;
-        internal static int idleCoilsTimeout;
+        internal static int motorHoldCurrentMultiplier;
         internal static int settleBuffer;
         internal static bool reverseDirection;
-        internal static string currentMove;
-        internal static string currentHold;
+        internal static bool temperatureCompensation;
         internal static int commandTimeout = 2000;
 
         internal static int? maxIncrement = null;
@@ -157,12 +146,12 @@ namespace ASCOM.DeepSkyDad.AF1
             tl = new TraceLogger("", "DeepSkyDad");
             ReadProfile(); // Read device configuration from the ASCOM Profile store
 
-            tl = new TraceLogger("", "DeepSkyDad.AF1");
+            tl = new TraceLogger("", "DeepSkyDad.AF3");
             tl.Enabled = traceState;
 
             tl.LogMessage("Telescope", "Starting initialisation");
 
-            tls = new TraceLogger("", "DeepSkyDad.AF1.Serial");
+            tls = new TraceLogger("", "DeepSkyDad.AF3.Serial");
             tls.Enabled = traceState;
 
             connectedState = false; // Initialise connected to false
@@ -323,13 +312,11 @@ namespace ASCOM.DeepSkyDad.AF1
                     connectedState = true;
                     LogMessage("Connected Set", "Connecting to port {0}", comPort);
                     serial = new Serial();
-                    serial.Speed = SerialSpeed.ps9600;
+                    serial.Speed = SerialSpeed.ps115200;
                     serial.PortName = comPort;
                     serial.DTREnable = false;
-                    //serial.Handshake = SerialHandshake.None;
                     serial.Connected = true;
                     serial.ReceiveTimeoutMs = commandTimeout;
-                    //serial.ReceiveTerminated("(READY)"); //wait for ready signal - this is needed because arduino auto-resets when serial connection is established to it (it can be prevented by putting capacitor between 5v and reset but not neccessary for autofocuser)
 
                     string actualFirmwareVersion = string.Empty;
                     try
@@ -338,7 +325,7 @@ namespace ASCOM.DeepSkyDad.AF1
                     }
                     catch (Exception)
                     {
-                        //retry
+                        //retry (in case Arduino reset on first connect and is not initialized yet, more: The board resets the controller chip when there is a wiggle on the DTR line of the serial connection)
                         actualFirmwareVersion = CommandString("GFRM");
                     }
 
@@ -377,7 +364,7 @@ namespace ASCOM.DeepSkyDad.AF1
                     var ss = 2;
                     if (stepSize == "1")
                     {
-                        ss = 1;
+                        ss = 0;
                     }
                     else if (stepSize == "1/2")
                     {
@@ -390,6 +377,26 @@ namespace ASCOM.DeepSkyDad.AF1
                     else if (stepSize == "1/8")
                     {
                         ss = 8;
+                    }
+                    else if (stepSize == "1/16")
+                    {
+                        ss = 16;
+                    }
+                    else if (stepSize == "1/32")
+                    {
+                        ss = 32;
+                    }
+                    else if (stepSize == "1/64")
+                    {
+                        ss = 64;
+                    }
+                    else if (stepSize == "1/128")
+                    {
+                        ss = 128;
+                    }
+                    else if (stepSize == "1/256")
+                    {
+                        ss = 256;
                     }
 
                     var spd = 3;
@@ -406,33 +413,16 @@ namespace ASCOM.DeepSkyDad.AF1
                         spd = 3;
                     }
 
-                    var coilsModeInt = 1;
-                    switch(coilsMode)
-                    {
-                        case "Idle - off":
-                            coilsModeInt = 0;
-                            break;
-                        case "Always on":
-                            coilsModeInt = 1;
-                            break;
-                        case "Idle - coils timeout (ms)":
-                            coilsModeInt = 2;
-                            break;
-                    }
-
-                    CommandString($"CONF{ss}|{coilsModeInt}|{(reverseDirection ? 1 : 0)}|{maxPosition}|{maxMovement}|{settleBuffer}|{idleCoilsTimeout}|180000|{currentMove}|{currentHold}");
+                    CommandString($"SSTP{ss}");
+                    CommandString($"SREV{(reverseDirection ? 1 : 0)}");
+                    CommandString($"SMXP{maxPosition}");
+                    CommandString($"SMXM{maxMovement}");
+                    CommandString($"SBUF{settleBuffer}");
                     CommandString($"SSPD{spd}");
-                    //CommandString($"SREV{(reverseDirection ? 1 : 0)}");
-                    //CommandString($"SMXP{maxPosition}");
-                    //CommandString($"SMXM{maxMovement}");
-                    //CommandString($"SBUF{settleBuffer}");
-                    //CommandString($"SSTP{ss}");
+                    CommandString($"SMHM{motorHoldCurrentMultiplier}");
                 }
                 else
                 {
-                    CommandString($"SCLM0");
-                    Thread.Sleep(100);
-
                     Disconnect();
                 }
             }
@@ -454,7 +444,7 @@ namespace ASCOM.DeepSkyDad.AF1
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 // TODO customise this driver description
-                string driverInfo = "ASCOM DSD AF1 driver. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
+                string driverInfo = "ASCOM DSD AF3 driver. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
                 tl.LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -485,7 +475,7 @@ namespace ASCOM.DeepSkyDad.AF1
         {
             get
             {
-                string name = "ASCOM.DSD.AF";
+                string name = "ASCOM.DSD.AF3";
                 tl.LogMessage("Name Get", name);
                 return name;
             }
@@ -595,13 +585,14 @@ namespace ASCOM.DeepSkyDad.AF1
         {
             get
             {
-                tl.LogMessage("TempComp Get", false.ToString());
-                return false;
+                tl.LogMessage("TempComp Get", temperatureCompensation.ToString());
+                return temperatureCompensation;
             }
             set
             {
-                tl.LogMessage("TempComp Set", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("TempComp", false);
+                if (value && Temperature == -127)
+                    throw new NotConnectedException("Temperature sensor not connected");
+                temperatureCompensation = value;
             }
         }
 
@@ -609,8 +600,10 @@ namespace ASCOM.DeepSkyDad.AF1
         {
             get
             {
-                tl.LogMessage("TempCompAvailable Get", false.ToString());
-                return false; // Temperature compensation is not available in this driver
+                var temp = Convert.ToDouble(CommandString($"GTMC"), new CultureInfo("en") { NumberFormat = { NumberDecimalSeparator = "." } });
+                var available = temp != -127;
+                tl.LogMessage("TempCompAvailable Get", available.ToString());
+                return available;
             }
         }
 
@@ -618,8 +611,11 @@ namespace ASCOM.DeepSkyDad.AF1
         {
             get
             {
-                tl.LogMessage("Temperature Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("Temperature", false);
+                var temp = Convert.ToDouble(CommandString($"GTMC"), new CultureInfo("en") { NumberFormat = { NumberDecimalSeparator = "." } });
+                if (temp == -127)
+                    throw new NotConnectedException("Temperature sensor not connected");
+
+                return temp;
             }
         }
 
@@ -744,12 +740,11 @@ namespace ASCOM.DeepSkyDad.AF1
                 resetOnConnect = Convert.ToBoolean(driverProfile.GetValue(driverID, resetOnConnectProfileName, string.Empty, resetOnConnectDefault));
                 setPositonOnConnect = Convert.ToBoolean(driverProfile.GetValue(driverID, setPositonOnConnectProfileName, string.Empty, setPositonOnConnectDefault));
                 setPositionOnConnectValue = Convert.ToInt32(driverProfile.GetValue(driverID, setPositonOnConnectValueProfileName, string.Empty, setPositonOnConnectValueDefault)); ;
-                coilsMode = driverProfile.GetValue(driverID, coilsModeProfileName, string.Empty, coilsModeDefault);
-                idleCoilsTimeout = Convert.ToInt32(driverProfile.GetValue(driverID, idleCoilsTimeoutProfileName, string.Empty, idleCoilsTimeoutDefault));
+                motorHoldCurrentMultiplier = Convert.ToInt32(driverProfile.GetValue(driverID, motorHoldCurrentMultiplierName, string.Empty, motorHoldCurrentMultiplierDefault));
                 reverseDirection = Convert.ToBoolean(driverProfile.GetValue(driverID, reverseDirectionProfileName, string.Empty, reverseDirectionDefault));
                 settleBuffer = Convert.ToInt32(driverProfile.GetValue(driverID, settleBufferProfileName, string.Empty, settleBufferDefault));
-                currentMove = driverProfile.GetValue(driverID, currentMoveProfileName, string.Empty, currentMoveDefault);
-                currentHold = driverProfile.GetValue(driverID, currentHoldProfileName, string.Empty, currentHoldDefault);
+                temperatureCompensation = Convert.ToBoolean(driverProfile.GetValue(driverID, temperatureCompensationProfileName, string.Empty, temperatureCompensationDefault));
+
             }
         }
 
@@ -770,12 +765,11 @@ namespace ASCOM.DeepSkyDad.AF1
                 driverProfile.WriteValue(driverID, resetOnConnectProfileName, resetOnConnect.ToString());
                 driverProfile.WriteValue(driverID, setPositonOnConnectProfileName, setPositonOnConnect.ToString());
                 driverProfile.WriteValue(driverID, setPositonOnConnectValueProfileName, setPositionOnConnectValue.ToString());
-                driverProfile.WriteValue(driverID, coilsModeProfileName, coilsMode.ToString());
-                driverProfile.WriteValue(driverID, idleCoilsTimeoutProfileName, idleCoilsTimeout.ToString());
+                driverProfile.WriteValue(driverID, motorHoldCurrentMultiplierName, motorHoldCurrentMultiplier.ToString());
                 driverProfile.WriteValue(driverID, settleBufferProfileName, settleBuffer.ToString());
                 driverProfile.WriteValue(driverID, reverseDirectionProfileName, reverseDirection.ToString());
-                driverProfile.WriteValue(driverID, currentMoveProfileName, currentMove);
-                driverProfile.WriteValue(driverID, currentHoldProfileName, currentHold);
+                driverProfile.WriteValue(driverID, temperatureCompensationProfileName, temperatureCompensation.ToString());
+
             }
         }
 

@@ -1,4 +1,4 @@
-namespace ASCOM.DeepSkyDad.AF1
+namespace ASCOM.DeepSkyDad.AF3
 {
     partial class SetupDialogForm
     {
@@ -50,28 +50,23 @@ namespace ASCOM.DeepSkyDad.AF1
             this.chkSetPositionOnConnect = new System.Windows.Forms.CheckBox();
             this.numericSetPositionOnConnectValue = new System.Windows.Forms.NumericUpDown();
             this.buttonReboot = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.currentMoveComboBox = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.currentHoldComboBox = new System.Windows.Forms.ComboBox();
             this.advancedPanel = new System.Windows.Forms.Panel();
+            this.label15 = new System.Windows.Forms.Label();
+            this.comboBoxSpeedMode = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.coilsModeCombo = new System.Windows.Forms.ComboBox();
-            this.idleCoilsTimeoutNumeric = new System.Windows.Forms.NumericUpDown();
+            this.holdCurrentMultiplierNumeric = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.showAdvancedBtn = new System.Windows.Forms.Button();
-            this.label15 = new System.Windows.Forms.Label();
-            this.comboBoxSpeedMode = new System.Windows.Forms.ComboBox();
+            this.chkTmpComp = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSettleBuffer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpMaxPosition)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpMaxMovement)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericSetPositionOnConnectValue)).BeginInit();
             this.advancedPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.idleCoilsTimeoutNumeric)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.holdCurrentMultiplierNumeric)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -100,7 +95,7 @@ namespace ASCOM.DeepSkyDad.AF1
             // 
             this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picASCOM.Image = global::ASCOM.DeepSkyDad.AF1.Properties.Resources.ASCOM;
+            this.picASCOM.Image = global::ASCOM.DeepSkyDad.AF3.Properties.Resources.ASCOM;
             this.picASCOM.Location = new System.Drawing.Point(887, 9);
             this.picASCOM.Name = "picASCOM";
             this.picASCOM.Size = new System.Drawing.Size(48, 56);
@@ -145,7 +140,12 @@ namespace ASCOM.DeepSkyDad.AF1
             "1",
             "1/2",
             "1/4",
-            "1/8"});
+            "1/8",
+            "1/16",
+            "1/32",
+            "1/64",
+            "1/128",
+            "1/256"});
             this.comboBoxStepSize.Location = new System.Drawing.Point(175, 42);
             this.comboBoxStepSize.Name = "comboBoxStepSize";
             this.comboBoxStepSize.Size = new System.Drawing.Size(121, 21);
@@ -251,7 +251,7 @@ namespace ASCOM.DeepSkyDad.AF1
             this.numericUpMaxPosition.Size = new System.Drawing.Size(120, 20);
             this.numericUpMaxPosition.TabIndex = 21;
             this.numericUpMaxPosition.Value = new decimal(new int[] {
-            100000,
+            1000000,
             0,
             0,
             0});
@@ -282,7 +282,7 @@ namespace ASCOM.DeepSkyDad.AF1
             this.numericUpMaxMovement.Size = new System.Drawing.Size(120, 20);
             this.numericUpMaxMovement.TabIndex = 23;
             this.numericUpMaxMovement.Value = new decimal(new int[] {
-            5000,
+            50000,
             0,
             0,
             0});
@@ -325,7 +325,7 @@ namespace ASCOM.DeepSkyDad.AF1
             this.numericSetPositionOnConnectValue.Size = new System.Drawing.Size(121, 20);
             this.numericSetPositionOnConnectValue.TabIndex = 33;
             this.numericSetPositionOnConnectValue.Value = new decimal(new int[] {
-            100000,
+            500000,
             0,
             0,
             0});
@@ -338,53 +338,9 @@ namespace ASCOM.DeepSkyDad.AF1
             this.buttonReboot.Name = "buttonReboot";
             this.buttonReboot.Size = new System.Drawing.Size(97, 24);
             this.buttonReboot.TabIndex = 35;
-            this.buttonReboot.Text = "Reboot AF1";
+            this.buttonReboot.Text = "Reboot AF3";
             this.buttonReboot.UseVisualStyleBackColor = true;
             this.buttonReboot.Click += new System.EventHandler(this.buttonReboot_Click);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(331, 100);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(79, 13);
-            this.label7.TabIndex = 37;
-            this.label7.Text = "Current - move:";
-            // 
-            // currentMoveComboBox
-            // 
-            this.currentMoveComboBox.FormattingEnabled = true;
-            this.currentMoveComboBox.Items.AddRange(new object[] {
-            "25%",
-            "50%",
-            "75%",
-            "100%"});
-            this.currentMoveComboBox.Location = new System.Drawing.Point(442, 97);
-            this.currentMoveComboBox.Name = "currentMoveComboBox";
-            this.currentMoveComboBox.Size = new System.Drawing.Size(116, 21);
-            this.currentMoveComboBox.TabIndex = 36;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(331, 127);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(73, 13);
-            this.label8.TabIndex = 39;
-            this.label8.Text = "Current - hold:";
-            // 
-            // currentHoldComboBox
-            // 
-            this.currentHoldComboBox.FormattingEnabled = true;
-            this.currentHoldComboBox.Items.AddRange(new object[] {
-            "25%",
-            "50%",
-            "75%",
-            "100%"});
-            this.currentHoldComboBox.Location = new System.Drawing.Point(442, 123);
-            this.currentHoldComboBox.Name = "currentHoldComboBox";
-            this.currentHoldComboBox.Size = new System.Drawing.Size(116, 21);
-            this.currentHoldComboBox.TabIndex = 38;
             // 
             // advancedPanel
             // 
@@ -395,18 +351,12 @@ namespace ASCOM.DeepSkyDad.AF1
             this.advancedPanel.Controls.Add(this.label13);
             this.advancedPanel.Controls.Add(this.buttonReboot);
             this.advancedPanel.Controls.Add(this.buttonFirmwareInfo);
-            this.advancedPanel.Controls.Add(this.label12);
             this.advancedPanel.Controls.Add(this.label6);
-            this.advancedPanel.Controls.Add(this.label8);
             this.advancedPanel.Controls.Add(this.numericUpMaxMovement);
             this.advancedPanel.Controls.Add(this.label5);
-            this.advancedPanel.Controls.Add(this.currentHoldComboBox);
             this.advancedPanel.Controls.Add(this.numericUpMaxPosition);
-            this.advancedPanel.Controls.Add(this.coilsModeCombo);
-            this.advancedPanel.Controls.Add(this.label7);
-            this.advancedPanel.Controls.Add(this.idleCoilsTimeoutNumeric);
+            this.advancedPanel.Controls.Add(this.holdCurrentMultiplierNumeric);
             this.advancedPanel.Controls.Add(this.label4);
-            this.advancedPanel.Controls.Add(this.currentMoveComboBox);
             this.advancedPanel.Controls.Add(this.numericUpDownSettleBuffer);
             this.advancedPanel.Controls.Add(this.label9);
             this.advancedPanel.Controls.Add(this.label3);
@@ -420,6 +370,27 @@ namespace ASCOM.DeepSkyDad.AF1
             this.advancedPanel.Size = new System.Drawing.Size(560, 270);
             this.advancedPanel.TabIndex = 40;
             this.advancedPanel.Visible = false;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(29, 72);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(67, 13);
+            this.label15.TabIndex = 49;
+            this.label15.Text = "Speed mode";
+            // 
+            // comboBoxSpeedMode
+            // 
+            this.comboBoxSpeedMode.FormattingEnabled = true;
+            this.comboBoxSpeedMode.Items.AddRange(new object[] {
+            "Low",
+            "Medium",
+            "High"});
+            this.comboBoxSpeedMode.Location = new System.Drawing.Point(175, 68);
+            this.comboBoxSpeedMode.Name = "comboBoxSpeedMode";
+            this.comboBoxSpeedMode.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxSpeedMode.TabIndex = 48;
             // 
             // label10
             // 
@@ -444,52 +415,21 @@ namespace ASCOM.DeepSkyDad.AF1
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(331, 45);
+            this.label13.Location = new System.Drawing.Point(311, 45);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(61, 13);
+            this.label13.Size = new System.Drawing.Size(125, 13);
             this.label13.TabIndex = 45;
-            this.label13.Text = "Coils mode:";
+            this.label13.Text = "Hold current multiplier (%)";
             // 
-            // label12
+            // holdCurrentMultiplierNumeric
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(331, 71);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(110, 13);
-            this.label12.TabIndex = 43;
-            this.label12.Text = "Idle coils timeout (ms):";
-            // 
-            // coilsModeCombo
-            // 
-            this.coilsModeCombo.FormattingEnabled = true;
-            this.coilsModeCombo.Items.AddRange(new object[] {
-            "Always on",
-            "Idle - off",
-            "Idle - coils timeout (ms)"});
-            this.coilsModeCombo.Location = new System.Drawing.Point(442, 43);
-            this.coilsModeCombo.Name = "coilsModeCombo";
-            this.coilsModeCombo.Size = new System.Drawing.Size(116, 21);
-            this.coilsModeCombo.TabIndex = 44;
-            this.coilsModeCombo.SelectedIndexChanged += new System.EventHandler(this.coilsModeCombo_SelectedIndexChanged);
-            // 
-            // idleCoilsTimeoutNumeric
-            // 
-            this.idleCoilsTimeoutNumeric.Location = new System.Drawing.Point(442, 71);
-            this.idleCoilsTimeoutNumeric.Maximum = new decimal(new int[] {
-            999999,
-            0,
-            0,
-            0});
-            this.idleCoilsTimeoutNumeric.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.idleCoilsTimeoutNumeric.Name = "idleCoilsTimeoutNumeric";
-            this.idleCoilsTimeoutNumeric.Size = new System.Drawing.Size(116, 20);
-            this.idleCoilsTimeoutNumeric.TabIndex = 42;
-            this.idleCoilsTimeoutNumeric.Value = new decimal(new int[] {
-            60000,
+            this.holdCurrentMultiplierNumeric.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
+            this.holdCurrentMultiplierNumeric.Location = new System.Drawing.Point(444, 42);
+            this.holdCurrentMultiplierNumeric.Name = "holdCurrentMultiplierNumeric";
+            this.holdCurrentMultiplierNumeric.Size = new System.Drawing.Size(116, 20);
+            this.holdCurrentMultiplierNumeric.TabIndex = 42;
+            this.holdCurrentMultiplierNumeric.Value = new decimal(new int[] {
+            100,
             0,
             0,
             0});
@@ -514,32 +454,22 @@ namespace ASCOM.DeepSkyDad.AF1
             this.showAdvancedBtn.UseVisualStyleBackColor = true;
             this.showAdvancedBtn.Click += new System.EventHandler(this.showAdvancedBtn_Click);
             // 
-            // label15
+            // chkTmpComp
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(29, 72);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(67, 13);
-            this.label15.TabIndex = 49;
-            this.label15.Text = "Speed mode";
-            // 
-            // comboBoxSpeedMode
-            // 
-            this.comboBoxSpeedMode.FormattingEnabled = true;
-            this.comboBoxSpeedMode.Items.AddRange(new object[] {
-            "Low",
-            "Medium",
-            "High"});
-            this.comboBoxSpeedMode.Location = new System.Drawing.Point(175, 68);
-            this.comboBoxSpeedMode.Name = "comboBoxSpeedMode";
-            this.comboBoxSpeedMode.Size = new System.Drawing.Size(121, 21);
-            this.comboBoxSpeedMode.TabIndex = 48;
+            this.chkTmpComp.AutoSize = true;
+            this.chkTmpComp.Location = new System.Drawing.Point(18, 121);
+            this.chkTmpComp.Name = "chkTmpComp";
+            this.chkTmpComp.Size = new System.Drawing.Size(155, 17);
+            this.chkTmpComp.TabIndex = 50;
+            this.chkTmpComp.Text = "Temperature compensation";
+            this.chkTmpComp.UseVisualStyleBackColor = true;
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(945, 284);
+            this.Controls.Add(this.chkTmpComp);
             this.Controls.Add(this.showAdvancedBtn);
             this.Controls.Add(this.advancedPanel);
             this.Controls.Add(this.chkReverseDirection);
@@ -556,7 +486,7 @@ namespace ASCOM.DeepSkyDad.AF1
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DeepSkyDad AF1 Setup";
+            this.Text = "DeepSkyDad AF3 Setup";
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSettleBuffer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpMaxPosition)).EndInit();
@@ -564,7 +494,7 @@ namespace ASCOM.DeepSkyDad.AF1
             ((System.ComponentModel.ISupportInitialize)(this.numericSetPositionOnConnectValue)).EndInit();
             this.advancedPanel.ResumeLayout(false);
             this.advancedPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.idleCoilsTimeoutNumeric)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.holdCurrentMultiplierNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -594,20 +524,15 @@ namespace ASCOM.DeepSkyDad.AF1
         private System.Windows.Forms.CheckBox chkSetPositionOnConnect;
         private System.Windows.Forms.NumericUpDown numericSetPositionOnConnectValue;
         private System.Windows.Forms.Button buttonReboot;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox currentMoveComboBox;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.ComboBox currentHoldComboBox;
         private System.Windows.Forms.Panel advancedPanel;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.ComboBox coilsModeCombo;
-        private System.Windows.Forms.NumericUpDown idleCoilsTimeoutNumeric;
+        private System.Windows.Forms.NumericUpDown holdCurrentMultiplierNumeric;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button showAdvancedBtn;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ComboBox comboBoxSpeedMode;
+        private System.Windows.Forms.CheckBox chkTmpComp;
     }
 }

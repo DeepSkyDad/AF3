@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 //
 // TODO - Add your authorship information here
-[assembly: AssemblyTitle("ASCOM.DeepSkyDad.AF1")]
+[assembly: AssemblyTitle("ASCOM.DeepSkyDad.AF3")]
 [assembly: AssemblyDescription("ASCOM Focuser driver for DeepSkyDad")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("The ASCOM Initiative")]
@@ -36,4 +36,4 @@ using System.Runtime.InteropServices;
 //
 // TODO - Set your driver's version here
 [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

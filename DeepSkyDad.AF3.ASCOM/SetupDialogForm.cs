@@ -8,7 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using ASCOM.Utilities;
 
-namespace ASCOM.DeepSkyDad.AF1
+namespace ASCOM.DeepSkyDad.AF3
 {
     [ComVisible(false)]					// Form not registered for COM!
     public partial class SetupDialogForm : Form
@@ -38,12 +38,10 @@ namespace ASCOM.DeepSkyDad.AF1
             Focuser.setPositonOnConnect = chkSetPositionOnConnect.Checked;
             if(Focuser.setPositonOnConnect)
                 Focuser.setPositionOnConnectValue = (int)numericSetPositionOnConnectValue.Value;
-            Focuser.coilsMode = (string)coilsModeCombo.SelectedItem;
-            Focuser.idleCoilsTimeout = (int)idleCoilsTimeoutNumeric.Value;
+            Focuser.motorHoldCurrentMultiplier = (int)holdCurrentMultiplierNumeric.Value;
             Focuser.reverseDirection = chkReverseDirection.Checked;
             Focuser.settleBuffer = (int)numericUpDownSettleBuffer.Value;
-            Focuser.currentMove = (string)currentMoveComboBox.SelectedItem;
-            Focuser.currentHold = (string)currentHoldComboBox.SelectedItem;
+            Focuser.temperatureCompensation = chkTmpComp.Checked;
         }
 
         private void cmdCancel_Click(object sender, EventArgs e) // Cancel button event handler
@@ -82,8 +80,6 @@ namespace ASCOM.DeepSkyDad.AF1
             chkSetPositionOnConnect.Checked = Focuser.setPositonOnConnect;
             numericSetPositionOnConnectValue.Value = Focuser.setPositionOnConnectValue;
             numericSetPositionOnConnectValue.Visible = Focuser.setPositonOnConnect;
-            coilsModeCombo.Text = Focuser.coilsMode;
-            idleCoilsTimeoutNumeric.Value = Focuser.idleCoilsTimeout;
             chkReverseDirection.Checked = Focuser.reverseDirection;
             numericUpDownSettleBuffer.Value = Focuser.settleBuffer;
             // set the list of com ports to those that are currently available
@@ -94,9 +90,8 @@ namespace ASCOM.DeepSkyDad.AF1
             {
                 comboBoxComPort.SelectedItem = Focuser.comPort;
             }
-            currentMoveComboBox.Text = Focuser.currentMove;
-            currentHoldComboBox.Text = Focuser.currentHold;
-            idleCoilsTimeoutNumeric.Enabled = Focuser.coilsMode == "Idle - coils timeout (ms)";
+            chkTmpComp.Checked = Focuser.temperatureCompensation;
+            holdCurrentMultiplierNumeric.Value = Focuser.motorHoldCurrentMultiplier;
             _suppressWarningMessageBox = false;
         }
 
@@ -206,34 +201,6 @@ namespace ASCOM.DeepSkyDad.AF1
                 this.advancedPanel.Visible = true;
                 this.Size = new Size(this.Size.Width + advancedPanel.Width, this.Height);
                
-            }
-        }
-
-        private void coilsModeCombo_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if(coilsModeCombo.Text != "Always on")
-            {
-                if(!_suppressWarningMessageBox)
-                {
-                    var confirmResult = MessageBox.Show("Selecting this mode will cause the coils to be turned off when motor is not running. This causes motor to loose its position. Are you sure you want to choose this option?",
-                                   "Warning",
-                                   MessageBoxButtons.YesNo);
-                    if (confirmResult == DialogResult.Yes)
-                    {
-                        idleCoilsTimeoutNumeric.Enabled = coilsModeCombo.Text == "Idle - coils timeout (ms)";
-                    }
-                    else
-                    {
-                        coilsModeCombo.SelectedIndex = 0;
-                        idleCoilsTimeoutNumeric.Enabled = false;
-                    }
-                } else
-                {
-                    idleCoilsTimeoutNumeric.Enabled = coilsModeCombo.Text == "Idle - coils timeout (ms)";
-                }
-            } else
-            {
-                idleCoilsTimeoutNumeric.Enabled = false;
             }
         }
     }

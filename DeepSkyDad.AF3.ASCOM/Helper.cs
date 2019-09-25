@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ASCOM.DeepSkyDad.AF1
+namespace ASCOM.DeepSkyDad.AF3
 {
     public class Helper
     {

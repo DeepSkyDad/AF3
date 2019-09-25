@@ -64,7 +64,7 @@ bool _eepromSaveAfState;
 #define MOTOR_SELECT_PIN_D5 5
 #define MOTOR_SELECT_PIN_D6 6
 
-#define MOTOR_I_14HS10_0404S_04A 300
+#define MOTOR_I_14HS10_0404S_04A 440 //300
 #define MOTOR_I_14HS17_0504S_05A 440
 
 bool _motorIsMoving;
@@ -89,21 +89,21 @@ TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX
 #define HC_PIN A0
 
 // BTNUP
-#define HC_BTNUP_VAL 350
-#define HC_BTNUP_MIN 300
-#define HC_BTNUP_MAX 390
+#define HC_BTNUP_VAL 455
+#define HC_BTNUP_MIN 405
+#define HC_BTNUP_MAX 495
 // BTNDOWN
-#define HC_BTNDOWN_VAL 483
-#define HC_BTNDOWN_MIN 390
-#define HC_BTNDOWN_MAX 500
+#define HC_BTNDOWN_VAL 575
+#define HC_BTNDOWN_MIN 525
+#define HC_BTNDOWN_MAX 625
 // BTNBOTH
-#define HC_BTNBOTH_VAL 314
-#define HC_BTNBOTH_MIN 230
-#define HC_BTNBOTH_MAX 299
+#define HC_BTNBOTH_VAL 375
+#define HC_BTNBOTH_MIN 325
+#define HC_BTNBOTH_MAX 425
 // CONNECTED
-#define HC_CONNECTED_VAL 660
-#define HC_CONNECTED_MIN 250
-#define HC_CONNECTED_MAX 710
+#define HC_CONNECTED_VAL 780
+#define HC_CONNECTED_MIN 325
+#define HC_CONNECTED_MAX 850
 
 #define HC_BTN_UP 1
 #define HC_BTN_DOWN 2
@@ -235,39 +235,12 @@ bool setTargetPosition(long pos) {
   }
   else
   {
-    if (_motorTargetPosition == (unsigned long)pos)
-    {
-      return true;
-    }
-
     _motorTargetPosition = pos;
-    return true;
   }
+  return true;
 }
 
 /* MOTOR FUNCTIONS */
-
-bool initUART() {
-  _driver.begin();
-
-  uint8_t result = _driver.test_connection();
-  if (result) {
-      return false;
-  }
-  
-  _driver.pdn_disable(true); //enable UART
-  _driver.rms_current(_motorI, ((float)_motorIHoldMultiplier)/100.0);
-  _driver.mstep_reg_select(true); //enable microstep selection over UART
-  _driver.I_scale_analog(false); //disable Vref scaling
-  writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
-  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
-  _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
-  _driver.intpol(true); //use interpolation
-  _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
-  digitalWrite(TMC220X_PIN_ENABLE, LOW); //enable coils
-  _motorUARTInitialized = true;
-  return true;
-}
 
 void startMotor() {
   _motorIsMoving = true;
@@ -382,6 +355,41 @@ void setIdleEepromWriteMs(char param[])
   _eepromAfState[EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS] = ms;
 }
 
+void setMotorCurrent(int multiplier)
+{
+  if (multiplier < 0)
+  {
+    multiplier = 0;
+  } else if(multiplier > 100) {
+    multiplier = 100;
+  }
+
+  _motorIHoldMultiplier = multiplier;
+  _driver.rms_current(_motorI, ((float)_motorIHoldMultiplier)/100.0);
+  _eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER] = multiplier;
+}
+
+bool initUART() {
+  _driver.begin();
+
+  if (_driver.test_connection()) {
+      return false;
+  }
+  
+  _driver.pdn_disable(true); //enable UART
+  setMotorCurrent((int)_motorIHoldMultiplier);
+  _driver.mstep_reg_select(true); //enable microstep selection over UART
+  _driver.I_scale_analog(false); //disable Vref scaling
+  writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
+  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
+  _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
+  _driver.intpol(true); //use interpolation
+  _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
+  digitalWrite(TMC220X_PIN_ENABLE, LOW); //enable coils
+  _motorUARTInitialized = true;
+  return true;
+}
+
 /* HAND CONTROLLER / TEMPERATURE SENSOR */
 int readHcPin() {
 	//smooth out annomalies
@@ -462,8 +470,8 @@ void autoDiscovery()
       float tempC = _sensors.getTempCByIndex(0);
       if (tempC != -127)
       {
-        Serial.print("TS Detected: ");
-        Serial.println(tempC);
+        //Serial.print("TS Detected: ");
+        //Serial.println(tempC);
         _temperatureCelsius = tempC;
         _tsConnected = true;
       }
@@ -553,7 +561,7 @@ void handleHC()
 			}
 			else if (btn_val == HC_BTN_DOWN)
 			{
-        Serial.println("HC DOWN");
+        //Serial.println("HC DOWN");
 				//button down
 				if (_motorManualIsMoving && !_motorManualIsMovingContinuous)
 				{
@@ -693,7 +701,7 @@ void executeCommand()
   else if (strcmp("STRG", _command) == 0)
   {
     long pos = strtol(_commandParam, NULL, 10);
-    if(setTargetPosition(pos)) {
+    if(!setTargetPosition(pos)) {
       printResponseErrorCode(101);
     } else {
       printSuccess();
@@ -842,6 +850,23 @@ void executeCommand()
     _eepromSaveAfState = true;
     printSuccess();
   }
+  else if (strcmp("GMHM", _command) == 0)
+  {
+    printResponse((long)_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
+  }
+  else if (strcmp("SMHM", _command) == 0)
+  {
+    long multiplier = strtol(_commandParam, NULL, 10);
+    setMotorCurrent(multiplier);
+    _eepromSaveAfState = true;
+    printSuccess();
+  }
+   else if (strcmp("SENA", _command) == 0)
+  {
+    long ena = strtol(_commandParam, NULL, 10);
+    digitalWrite(TMC220X_PIN_ENABLE, ena == 1 ? LOW : HIGH);
+    printSuccess();
+  }
   else if (strcmp("GTMC", _command) == 0)
   {
     printResponse(_temperatureCelsius);
@@ -854,6 +879,10 @@ void executeCommand()
     Serial.println(_motorI);
     Serial.print("Position: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_POSITION]);
+    Serial.print("Temperature: ");
+    Serial.println(_temperatureCelsius);
+    Serial.print("HC connected: ");
+    Serial.println(_hcConnected);
     Serial.print("Max position: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_MAX_POSITION]);
     Serial.print("Max movement: ");
@@ -948,8 +977,8 @@ void loop()
 
   if (_motorIsMoving)
   {
-    //give priority to motor with dedicated 300ms loops (effectivly pausing main loop, including serial event processing)
-    while (millis() - _motorIsMovingLastRunMs < 300)
+    //give priority to motor with dedicated 50ms loops (effectivly pausing main loop, including serial event processing)
+    while (millis() - _motorIsMovingLastRunMs < 50)
     {
       if(_motorManualIsMovingContinuous) {
         if(_motorManualIsMovingContinuousDir) {

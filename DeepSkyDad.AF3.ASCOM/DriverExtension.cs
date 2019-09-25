@@ -7,7 +7,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 
-namespace ASCOM.DeepSkyDad.AF1
+namespace ASCOM.DeepSkyDad.AF3
 {
     public partial class Focuser
     {
@@ -122,7 +122,12 @@ namespace ASCOM.DeepSkyDad.AF1
                     response = serial.ReceiveTerminated(")"); //wait until termination character
 
                     if (response.StartsWith("!"))
+                    {
+                        if(response.Contains("999"))
+                            throw new ASCOM.DriverException($"Motor initialization failed. Please check the 12V power cable and try again");
                         throw new ApplicationException($"Command failed, response: {response}");
+                    }
+                        
 
                     tls.LogMessage("Response", response);
                     tl.LogMessage("CommandString sync", $"Response for {command} received: {response}");

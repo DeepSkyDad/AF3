@@ -9,48 +9,48 @@
 ;4. Enter command "signtool.exe sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p" 
 SignTool=MsSign $f
 AppID={{10cc53ba-ec1f-4cca-8e95-62aa97be4f96}
-AppName=ASCOM DSD AF1 v1.2.0
-AppVerName=ASCOM DSD AF1 v1.2.0
-AppVersion=1.2.0
+AppName=ASCOM DSD AF3 v1.0.0
+AppVerName=ASCOM DSD AF3 v1.0.0
+AppVersion=1.0.0
 AppPublisher=Pavle Gartner <pavle.gartner@gmail.com>
 AppPublisherURL=mailto:pavle.gartner@gmail.com
 AppSupportURL=http://tech.groups.yahoo.com/group/ASCOM-Talk/
 AppUpdatesURL=http://ascom-standards.org/
-VersionInfoVersion=1.2.0
+VersionInfoVersion=1.0.0
 MinVersion=0,5.0.2195sp4
 DefaultDirName="{cf}\ASCOM\Focuser"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir="."
-OutputBaseFilename="ASCOM DSD AF1 Setup v1.2.0"
+OutputBaseFilename="ASCOM DSD AF3 Setup v1.0.0"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
 WizardImageFile="C:\Program Files (x86)\ASCOM\Platform 6 Developer Components\Installer Generator\Resources\WizardImage.bmp"
 LicenseFile="C:\Program Files (x86)\ASCOM\Platform 6 Developer Components\Installer Generator\Resources\CreativeCommons.txt"
 ; {cf}\ASCOM\Uninstall\Focuser folder created by Platform, always
-UninstallFilesDir="{cf}\ASCOM\Uninstall\Focuser\DSD AF1"
+UninstallFilesDir="{cf}\ASCOM\Uninstall\Focuser\DSD AF3"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
-Name: "{cf}\ASCOM\Uninstall\Focuser\DSD AF1"
-Name: "{app}\ASCOM.DeepSkyDad.AF1"
+Name: "{cf}\ASCOM\Uninstall\Focuser\DSD AF3"
+Name: "{app}\ASCOM.DeepSkyDad.AF3"
 ; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
 
 [Files]
-Source: "D:\Projects\DeepSkyDad.AF1\DeepSkyDad.AF1.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF1.Focuser.dll"; DestDir: "{app}\ASCOM.DeepSkyDad.AF1"
+Source: "D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF3.Focuser.dll"; DestDir: "{app}\ASCOM.DeepSkyDad.AF3"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
-Source: "D:\Projects\DeepSkyDad.AF1\DeepSkyDad.AF1.ASCOM\ReadMe.htm"; DestDir: "{app}\ASCOM.DeepSkyDad.AF1"; Flags: isreadme
+Source: "D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\ReadMe.htm"; DestDir: "{app}\ASCOM.DeepSkyDad.AF3"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
-Source: "D:\Projects\DeepSkyDad.AF1\DeepSkyDad.AF1.ASCOM\readme.jpg"; DestDir: "{app}\ASCOM.DeepSkyDad.AF1";
+Source: "D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\readme.jpg"; DestDir: "{app}\ASCOM.DeepSkyDad.AF3";
 
 ; Only if driver is .NET
 [Run]
 ; Only for .NET assembly/in-proc drivers
-Filename: "{dotnet4032}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF1\ASCOM.DeepSkyDad.AF1.Focuser.dll"""; Flags: runhidden 32bit
-Filename: "{dotnet4064}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF1\ASCOM.DeepSkyDad.AF1.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
+Filename: "{dotnet4032}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 32bit
+Filename: "{dotnet4064}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
 
 
 
@@ -58,10 +58,10 @@ Filename: "{dotnet4064}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSk
 ; Only if driver is .NET
 [UninstallRun]
 ; Only for .NET assembly/in-proc drivers
-Filename: "{dotnet4032}\regasm.exe"; Parameters: "-u ""{app}\ASCOM.DeepSkyDad.AF1\ASCOM.DeepSkyDad.AF1.Focuser.dll"""; Flags: runhidden 32bit
+Filename: "{dotnet4032}\regasm.exe"; Parameters: "-u ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 32bit
 ; This helps to give a clean uninstall
-Filename: "{dotnet4064}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF1\ASCOM.DeepSkyDad.AF1.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
-Filename: "{dotnet4064}\regasm.exe"; Parameters: "-u ""{app}\ASCOM.DeepSkyDad.AF1\ASCOM.DeepSkyDad.AF1.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
+Filename: "{dotnet4064}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
+Filename: "{dotnet4064}\regasm.exe"; Parameters: "-u ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
 
 
 
