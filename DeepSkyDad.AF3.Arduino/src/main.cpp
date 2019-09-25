@@ -6,7 +6,7 @@
     Each index contains different property, with last one containing checksum (sum of all previous values, so we can validate its contents).
     Additionally, values are saved to a different address every time. Writing to same address every time would wear EEPROM out faster.
     Autofocuseer state:
-    {<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <checksum>}
+    {<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIHoldMultiplier>, <checksum>}
 
   COMMAND SET
     Commands are executed via serial COM port communication. 
@@ -17,6 +17,7 @@
     If command results in error, response starts with ! and ends with ), containing error code. List of error codes:
       100 - command not found
       101 - relative movement bigger from max. movement
+      999 - UART not initalized (check motor power)
     The actual set of required commands is based on ASCOM IFocuserV3 interface, for more check:
     https://ascom-standards.org/Help/Platform/html/T_ASCOM_DeviceInterface_IFocuserV3.htm
 
@@ -29,6 +30,8 @@
 #include <DallasTemperature.h>
 #include <TMCStepper.h>
 
+/* EEPROM */
+//{<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIHoldMultiplier>, <checksum>}
 #define EEPROM_AF_STATE_POSITION 0
 #define EEPROM_AF_STATE_MAX_POSITION 1
 #define EEPROM_AF_STATE_MAX_MOVEMENT 2
@@ -37,19 +40,19 @@
 #define EEPROM_AF_STATE_SETTLE_BUFFER_MS 5
 #define EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS 6
 #define EEPROM_AF_STATE_REVERSE_DIRECTION 7
-#define EEPROM_AF_STATE_CHECKSUM 8
+#define EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER 8
+#define EEPROM_AF_STATE_CHECKSUM 9
 
-//{<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <checksum>}
-long _eepromAfState[] = {0, 0, 0, 0, 0, 0, 0, 0, 9999};
-long _eepromAfPrevState[] = {0, 0, 0, 0, 0, 0, 0, 0, 9999};
-long _eepromAfStateDefault[] = {50000, 100000, 5000, 2, 3, 0, 180000, 0, 0};
+long _eepromAfState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
+long _eepromAfPrevState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
+long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 3, 0, 180000, 0, 50, 0};
 int _eepromAfStatePropertyCount = sizeof(_eepromAfState) / sizeof(long);
 int _eepromAfStateAddressSize = sizeof(_eepromAfState);
 int _eepromAfStateAdressesCount = EEPROMSizeATmega328 / _eepromAfStateAddressSize;
 int _eepromAfStateCurrentAddress;
 bool _eepromSaveAfState;
 
-/* TMC2208 */
+/* MOTOR */
 #define TMC220X_PIN_ENABLE 9
 #define TMC220X_PIN_DIR 2
 #define TMC220X_PIN_STEP 3
@@ -58,17 +61,31 @@ bool _eepromSaveAfState;
 #define TMC220X_PIN_UART_RX 11
 #define TMC220X_PIN_UART_TX 12
 
-TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX, 0.11, true);
+#define MOTOR_SELECT_PIN_D5 5
+#define MOTOR_SELECT_PIN_D6 6
 
-/* MOTOR SELECT */
-#define MOTOR_SELECT_PIN_A 5
-#define MOTOR_SELECT_PIN_B 6
 #define MOTOR_I_14HS10_0404S_04A 300
 #define MOTOR_I_14HS17_0504S_05A 440
-#define MOTOR_I_HOLD_MULTIPLYER 0.5 //TODO: read from eeprom
+
+bool _motorIsMoving;
+bool _motorManualIsMoving;
+bool _motorManualIsMovingContinuous;
+bool _motorManualIsMovingContinuousDir;
+bool _motorManualIsCoarse = true;
+int _motorManualFineSteps = 10;
+int _motorManualCoarseSteps = 500;
+unsigned long _motorTargetPosition;
+unsigned long _motorSettleBufferPrevMs;
+unsigned long _motorIsMovingLastRunMs;
+unsigned long _motorLastMoveEepromMs;
+long _motorSpeedFactor;
+long _motorI;
+long _motorIHoldMultiplier;
+bool _motorUARTInitialized = false;
+
+TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX, 0.11, true);
 
 /* HAND CONTROLLER/TEMPERATURE SENSOR */
-
 #define HC_PIN A0
 
 // BTNUP
@@ -103,21 +120,7 @@ bool _tsConnected;
 float _temperatureCelsius = -127;
 float _temperatureFahrenheit = -127;
 
-/* MOTOR */
-bool _motorIsMoving;
-bool _motorManualIsMoving;
-bool _motorManualIsMovingContinuous;
-bool _motorManualIsMovingContinuousDir;
-bool _motorManualIsCoarse = true;
-int _motorManualFineSteps = 10;
-int _motorManualCoarseSteps = 500;
-unsigned long _motorTargetPosition;
-unsigned long _motorSettleBufferPrevMs;
-unsigned long _motorIsMovingLastRunMs;
-unsigned long _motorLastMoveEepromMs;
-long _motorSpeedFactor;
-
-/* Serial communication */
+/* SERIAL */
 char _serialCommandRaw[70];
 int _serialCommandRawIdx;
 int _serialCommandRawLength;
@@ -128,7 +131,7 @@ int _commandParamLength;
 const char firmwareName[] = "DeepSkyDad.AF3";
 const char firmwareVersion[] = "1.0.0";
 
-/* EEPROM functions */
+/* EEPROM - functions */
 bool eepromValidateChecksum()
 {
   long checksum = 0;
@@ -217,57 +220,10 @@ bool eepromRead()
   return eepromValidateChecksum();
 }
 
-void printResponse(int response)
-{
-  Serial.print("(");
-  Serial.print(response);
-  Serial.print(")");
-}
-
-void printResponse(long response)
-{
-  Serial.print("(");
-  Serial.print(response);
-  Serial.print(")");
-}
-
-void printResponse(unsigned long response)
-{
-  Serial.print("(");
-  Serial.print(response);
-  Serial.print(")");
-}
-
-void printResponse(char response[])
-{
-  Serial.print("(");
-  Serial.print(response);
-  Serial.print(")");
-}
-
-void printResponse(float response)
-{
-  Serial.print("(");
-  Serial.print(response);
-  Serial.print(")");
-}
-
-void printSuccess()
-{
-  Serial.print("(OK)");
-}
-
-void printResponseErrorCode(int code)
-{
-  Serial.print("!");
-  Serial.print(code);
-  Serial.print(")");
-}
-
-void setTargetPosition(long pos) {
+bool setTargetPosition(long pos) {
   if (abs(_eepromAfState[EEPROM_AF_STATE_POSITION] - pos) > _eepromAfState[EEPROM_AF_STATE_MAX_MOVEMENT])
   {
-    printResponseErrorCode(101);
+    return false;
   }
   else if (pos < 0)
   {
@@ -281,31 +237,44 @@ void setTargetPosition(long pos) {
   {
     if (_motorTargetPosition == (unsigned long)pos)
     {
-      printSuccess();
-      return;
+      return true;
     }
 
     _motorTargetPosition = pos;
-    printSuccess();
+    return true;
   }
 }
 
 /* MOTOR FUNCTIONS */
 
-void startMotor() {
-  Serial.println("START MOTOR");
-  _motorIsMoving = true;
-    /*
-      When waking up from sleep mode,
-      approximately 1ms of time must pass before a
-      STEP command can be issued to allow the
-      internal circuitry to stabilize.
-    */
-    delayMicroseconds(1000);
-    _motorIsMovingLastRunMs = millis();
+bool initUART() {
+  _driver.begin();
 
-    switch (_eepromAfState[EEPROM_AF_STATE_SPEED_MODE])
-    {
+  uint8_t result = _driver.test_connection();
+  if (result) {
+      return false;
+  }
+  
+  _driver.pdn_disable(true); //enable UART
+  _driver.rms_current(_motorI, ((float)_motorIHoldMultiplier)/100.0);
+  _driver.mstep_reg_select(true); //enable microstep selection over UART
+  _driver.I_scale_analog(false); //disable Vref scaling
+  writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
+  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
+  _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
+  _driver.intpol(true); //use interpolation
+  _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
+  digitalWrite(TMC220X_PIN_ENABLE, LOW); //enable coils
+  _motorUARTInitialized = true;
+  return true;
+}
+
+void startMotor() {
+  _motorIsMoving = true;
+  _motorIsMovingLastRunMs = millis();
+
+  switch (_eepromAfState[EEPROM_AF_STATE_SPEED_MODE])
+  {
     case 1:
         _motorSpeedFactor = 30;
         break;
@@ -318,7 +287,7 @@ void startMotor() {
     default:
         _motorSpeedFactor = 1;
         break;
-    }
+  }
 }
 
 void stopMotor()
@@ -342,14 +311,7 @@ void writeStepMode(int sm)
   }
 
   _driver.microsteps(sm); 
-
   _eepromAfState[EEPROM_AF_STATE_STEP_MODE] = sm;
-}
-
-void setStepMode(char param[])
-{
-  long sm = strtol(param, NULL, 10);
-  writeStepMode(sm);
 }
 
 void setSpeedMode(char param[])
@@ -420,7 +382,7 @@ void setIdleEepromWriteMs(char param[])
   _eepromAfState[EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS] = ms;
 }
 
-//HC/TS
+/* HAND CONTROLLER / TEMPERATURE SENSOR */
 int readHcPin() {
 	//smooth out annomalies
 	int x=0, i=0, xTmp;
@@ -653,8 +615,64 @@ float getTempCByPin()
   return _sensors.getTempCByIndex(0);
 }
 
+
+/* SERIAL - functions */
+
+void printResponse(int response)
+{
+  Serial.print("(");
+  Serial.print(response);
+  Serial.print(")");
+}
+
+void printResponse(long response)
+{
+  Serial.print("(");
+  Serial.print(response);
+  Serial.print(")");
+}
+
+void printResponse(unsigned long response)
+{
+  Serial.print("(");
+  Serial.print(response);
+  Serial.print(")");
+}
+
+void printResponse(char response[])
+{
+  Serial.print("(");
+  Serial.print(response);
+  Serial.print(")");
+}
+
+void printResponse(float response)
+{
+  Serial.print("(");
+  Serial.print(response);
+  Serial.print(")");
+}
+
+void printSuccess()
+{
+  Serial.print("(OK)");
+}
+
+void printResponseErrorCode(int code)
+{
+  Serial.print("!");
+  Serial.print(code);
+  Serial.print(")");
+}
+
+
 void executeCommand()
 {
+  if(!!_motorUARTInitialized) {
+    printResponseErrorCode(999);
+    return;
+  }
+
   if (strcmp("GFRM", _command) == 0)
   {
     Serial.print("(");
@@ -675,7 +693,11 @@ void executeCommand()
   else if (strcmp("STRG", _command) == 0)
   {
     long pos = strtol(_commandParam, NULL, 10);
-    setTargetPosition(pos);
+    if(setTargetPosition(pos)) {
+      printResponseErrorCode(101);
+    } else {
+      printSuccess();
+    }
   }
   else if (strcmp("GMOV", _command) == 0)
   {
@@ -744,7 +766,8 @@ void executeCommand()
   }
   else if (strcmp("SSTP", _command) == 0)
   {
-    setStepMode(_commandParam);
+    long sm = strtol(_commandParam, NULL, 10);
+    writeStepMode(sm);
     _eepromSaveAfState = true;
     printSuccess();
   }
@@ -819,35 +842,37 @@ void executeCommand()
     _eepromSaveAfState = true;
     printSuccess();
   }
-  else if (strcmp("UART", _command) == 0)
-  {
-    
-
-  
-    return;
-  }
   else if (strcmp("GTMC", _command) == 0)
   {
     printResponse(_temperatureCelsius);
   }
   else if (strcmp("DEBG", _command) == 0)
   {
+//{<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIHoldMultiplier>, <checksum>}
+
+
     Serial.print("Memory address: ");
     Serial.println(_eepromAfStateCurrentAddress);
+    Serial.print("Motor current (mA): ");
+    Serial.println(_motorI);
     Serial.print("Position: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_POSITION]);
-    Serial.print("Max movement: ");
-    Serial.println(_eepromAfState[EEPROM_AF_STATE_MAX_MOVEMENT]);
     Serial.print("Max position: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_MAX_POSITION]);
-    Serial.print("Settle buffer ms: ");
-    Serial.println(_eepromAfState[EEPROM_AF_STATE_SETTLE_BUFFER_MS]);
+    Serial.print("Max movement: ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_MAX_MOVEMENT]);
     Serial.print("Step mode: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
-    Serial.print("Reverse direction: ");
-    Serial.println(_eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION]);
+    Serial.print("Speed mode: ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_SPEED_MODE]);
+    Serial.print("Settle buffer ms: ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_SETTLE_BUFFER_MS]);
     Serial.print("Idle eeprom write (ms): ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS]);
+    Serial.print("Reverse direction: ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION]);
+    Serial.print("Motor current hold multiplier (%): ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
   }
   else
   {
@@ -858,10 +883,6 @@ void executeCommand()
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial)
-  {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
 
   EEPROM.setMemPool(0, EEPROMSizeATmega328);
 
@@ -885,8 +906,8 @@ void setup()
   pinMode(TMC220X_PIN_MS1, OUTPUT);
   pinMode(TMC220X_PIN_MS2, OUTPUT);
   pinMode(TMC220X_PIN_ENABLE, OUTPUT);
-  pinMode(MOTOR_SELECT_PIN_A, INPUT);
-  pinMode(MOTOR_SELECT_PIN_B, INPUT);
+  pinMode(MOTOR_SELECT_PIN_D5, INPUT);
+  pinMode(MOTOR_SELECT_PIN_D6, INPUT);
   pinMode(A0, INPUT);
 
   digitalWrite(TMC220X_PIN_DIR, LOW);
@@ -894,6 +915,7 @@ void setup()
   digitalWrite(TMC220X_PIN_ENABLE, HIGH);
   
   _motorTargetPosition = _eepromAfState[EEPROM_AF_STATE_POSITION];
+  _motorIHoldMultiplier = _eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER];
   _motorSettleBufferPrevMs = 0L;
   _motorLastMoveEepromMs = 0L;
 
@@ -901,46 +923,32 @@ void setup()
   _sensors.begin();
 
   //MOTOR SELECTION HEADERS
-  float motorI = MOTOR_I_14HS10_0404S_04A;
-  int a = digitalRead(MOTOR_SELECT_PIN_A);
-  int b = digitalRead(MOTOR_SELECT_PIN_B);
+  _motorI = MOTOR_I_14HS10_0404S_04A;
+  int d5 = digitalRead(MOTOR_SELECT_PIN_D5);
+  int d6 = digitalRead(MOTOR_SELECT_PIN_D6);
   
-  if(a == HIGH && b == HIGH) {
-    motorI = MOTOR_I_14HS10_0404S_04A;
-    Serial.println("MOTOR_I_14HS10_0404S_04A");
-  } else if(a == HIGH && b == LOW) {
-    motorI = MOTOR_I_14HS17_0504S_05A;
-    Serial.println("MOTOR_I_14HS17_0504S_05A");
-  } else if(a == LOW && b == HIGH) {
+  if(d5 == HIGH && d6 == HIGH) {
+    _motorI = MOTOR_I_14HS10_0404S_04A;
+  } else if(d5 == HIGH && d6 == LOW) {
+    _motorI = MOTOR_I_14HS17_0504S_05A;
+  } else if(d5 == LOW && d6 == HIGH) {
     //TODO
-  } else if(a == LOW && b == LOW) {
+  } else if(d5 == LOW && d6 == LOW) {
     //TODO
   }
 
-  //UART
-  _driver.begin();
-
-  //TODO: do lazy loading or something similar if initial UART fails... 
-  uint8_t result = _driver.test_connection();
-  if (result) {
-       Serial.println("UART failed");
-      return;
-  }
-  
-  _driver.pdn_disable(true); //enable UART
-  _driver.rms_current(motorI, MOTOR_I_HOLD_MULTIPLYER);
-  _driver.mstep_reg_select(true); //enable microstep selection over UART
-  _driver.I_scale_analog(false); //disable Vref scaling
-  writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
-  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
-  _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
-  _driver.intpol(true); //use interpolation
-  _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
-  digitalWrite(TMC220X_PIN_ENABLE, LOW);
+  initUART();
 }
 
 void loop()
 { 
+  if(!_motorUARTInitialized) {
+    if(!initUART()) {
+      delay(500);
+      return;
+    }
+  }
+
   if (_motorIsMoving)
   {
     //give priority to motor with dedicated 300ms loops (effectivly pausing main loop, including serial event processing)
