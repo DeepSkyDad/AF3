@@ -6,7 +6,7 @@
     Each index contains different property, with last one containing checksum (sum of all previous values, so we can validate its contents).
     Additionally, values are saved to a different address every time. Writing to same address every time would wear EEPROM out faster.
     Autofocuseer state:
-    {<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIHoldMultiplier>, <checksum>}
+    {<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIMoveMultiplier>, <motorIHoldMultiplier>, <checksum>}
 
   COMMAND SET
     Commands are executed via serial COM port communication. 
@@ -31,7 +31,7 @@
 #include <TMCStepper.h>
 
 /* EEPROM */
-//{<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIHoldMultiplier>, <checksum>}
+//{<position>, <maxPosition>, <maxMovement>, <stepMode>, <speedMode>, <settleBufferMs>, <idleEepromWriteMs>, <reverseDirection>, <motorIMoveMultiplier>, <motorIHoldMultiplier>, <checksum>}
 #define EEPROM_AF_STATE_POSITION 0
 #define EEPROM_AF_STATE_MAX_POSITION 1
 #define EEPROM_AF_STATE_MAX_MOVEMENT 2
@@ -40,12 +40,13 @@
 #define EEPROM_AF_STATE_SETTLE_BUFFER_MS 5
 #define EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS 6
 #define EEPROM_AF_STATE_REVERSE_DIRECTION 7
-#define EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER 8
-#define EEPROM_AF_STATE_CHECKSUM 9
+#define EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER 8
+#define EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER 9
+#define EEPROM_AF_STATE_CHECKSUM 10
 
-long _eepromAfState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
-long _eepromAfPrevState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
-long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 3, 0, 180000, 0, 50, 0};
+long _eepromAfState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
+long _eepromAfPrevState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
+long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 3, 0, 180000, 0, 80, 40, 0};
 int _eepromAfStatePropertyCount = sizeof(_eepromAfState) / sizeof(long);
 int _eepromAfStateAddressSize = sizeof(_eepromAfState);
 int _eepromAfStateAdressesCount = EEPROMSizeATmega328 / _eepromAfStateAddressSize;
@@ -80,6 +81,7 @@ unsigned long _motorIsMovingLastRunMs;
 unsigned long _motorLastMoveEepromMs;
 long _motorSpeedFactor;
 long _motorI;
+long _motorIMoveMultiplier;
 long _motorIHoldMultiplier;
 bool _motorUARTInitialized = false;
 
@@ -355,18 +357,36 @@ void setIdleEepromWriteMs(char param[])
   _eepromAfState[EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS] = ms;
 }
 
-void setMotorCurrent(int multiplier)
+void setMotorCurrent(int moveMultiplier, int holdMultiplier)
 {
-  if (multiplier < 0)
+  if (moveMultiplier < 0)
   {
-    multiplier = 0;
-  } else if(multiplier > 100) {
-    multiplier = 100;
+    moveMultiplier = 0;
+  } else if(moveMultiplier > 100) {
+    moveMultiplier = 100;
   }
 
-  _motorIHoldMultiplier = multiplier;
-  _driver.rms_current(_motorI, ((float)_motorIHoldMultiplier)/100.0);
-  _eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER] = multiplier;
+  if (holdMultiplier < 0)
+  {
+    holdMultiplier = 0;
+  } else if(holdMultiplier > 100) {
+    holdMultiplier = 100;
+  }
+
+  _motorIMoveMultiplier = moveMultiplier;
+  _motorIHoldMultiplier = holdMultiplier;
+  
+  int mA = _motorI*(((float)moveMultiplier)/100.0);
+  float multiplier = ((float)holdMultiplier)/100.0;
+
+  //Serial.print("Move current (mA): ");
+  //Serial.print(mA);
+  //Serial.print(", Hold multiplier: ");
+  //Serial.println(multiplier);
+
+  _driver.rms_current(mA, multiplier);
+  _eepromAfState[EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER] = moveMultiplier;
+  _eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER] = holdMultiplier;
 }
 
 bool initUART() {
@@ -377,7 +397,7 @@ bool initUART() {
   }
   
   _driver.pdn_disable(true); //enable UART
-  setMotorCurrent((int)_motorIHoldMultiplier);
+  setMotorCurrent((int)_motorIMoveMultiplier, (int)_motorIHoldMultiplier);
   _driver.mstep_reg_select(true); //enable microstep selection over UART
   _driver.I_scale_analog(false); //disable Vref scaling
   writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
@@ -850,18 +870,31 @@ void executeCommand()
     _eepromSaveAfState = true;
     printSuccess();
   }
-  else if (strcmp("GMHM", _command) == 0)
+  else if (strcmp("GMMM", _command) == 0)
   {
-    printResponse((long)_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
+    printResponse((long)_eepromAfState[EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER]);
+  }
+   else if (strcmp("SMMM", _command) == 0)
+  {
+    long multiplier = strtol(_commandParam, NULL, 10);
+    setMotorCurrent(multiplier, _motorIHoldMultiplier);
+    _eepromSaveAfState = true;
+    printSuccess();
+  }
+  else if (strcmp("SENA", _command) == 0)
+  {
+    long ena = strtol(_commandParam, NULL, 10);
+    digitalWrite(TMC220X_PIN_ENABLE, ena == 1 ? LOW : HIGH);
+    printSuccess();
   }
   else if (strcmp("SMHM", _command) == 0)
   {
     long multiplier = strtol(_commandParam, NULL, 10);
-    setMotorCurrent(multiplier);
+    setMotorCurrent(_motorIMoveMultiplier, multiplier);
     _eepromSaveAfState = true;
     printSuccess();
   }
-   else if (strcmp("SENA", _command) == 0)
+  else if (strcmp("SENA", _command) == 0)
   {
     long ena = strtol(_commandParam, NULL, 10);
     digitalWrite(TMC220X_PIN_ENABLE, ena == 1 ? LOW : HIGH);
@@ -875,8 +908,12 @@ void executeCommand()
   {
     Serial.print("Memory address: ");
     Serial.println(_eepromAfStateCurrentAddress);
-    Serial.print("Motor current (mA): ");
+    Serial.print("Motor full current (mA): ");
     Serial.println(_motorI);
+    Serial.print("Motor current move multiplier (%): ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER]);
+    Serial.print("Motor current hold multiplier (%): ");
+    Serial.println(_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
     Serial.print("Position: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_POSITION]);
     Serial.print("Temperature: ");
@@ -897,8 +934,6 @@ void executeCommand()
     Serial.println(_eepromAfState[EEPROM_AF_STATE_IDLE_EEPROM_WRITE_MS]);
     Serial.print("Reverse direction: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION]);
-    Serial.print("Motor current hold multiplier (%): ");
-    Serial.println(_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
   }
   else
   {
@@ -941,6 +976,7 @@ void setup()
   digitalWrite(TMC220X_PIN_ENABLE, HIGH);
   
   _motorTargetPosition = _eepromAfState[EEPROM_AF_STATE_POSITION];
+  _motorIMoveMultiplier = _eepromAfState[EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER];
   _motorIHoldMultiplier = _eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER];
   _motorSettleBufferPrevMs = 0L;
   _motorLastMoveEepromMs = 0L;

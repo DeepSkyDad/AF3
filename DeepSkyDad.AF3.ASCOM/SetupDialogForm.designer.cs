@@ -60,6 +60,8 @@ namespace ASCOM.DeepSkyDad.AF3
             this.label9 = new System.Windows.Forms.Label();
             this.showAdvancedBtn = new System.Windows.Forms.Button();
             this.chkTmpComp = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.moveCurrentMultiplierNumeric = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSettleBuffer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpMaxPosition)).BeginInit();
@@ -67,6 +69,7 @@ namespace ASCOM.DeepSkyDad.AF3
             ((System.ComponentModel.ISupportInitialize)(this.numericSetPositionOnConnectValue)).BeginInit();
             this.advancedPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.holdCurrentMultiplierNumeric)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.moveCurrentMultiplierNumeric)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -344,6 +347,8 @@ namespace ASCOM.DeepSkyDad.AF3
             // 
             // advancedPanel
             // 
+            this.advancedPanel.Controls.Add(this.label7);
+            this.advancedPanel.Controls.Add(this.moveCurrentMultiplierNumeric);
             this.advancedPanel.Controls.Add(this.label15);
             this.advancedPanel.Controls.Add(this.comboBoxSpeedMode);
             this.advancedPanel.Controls.Add(this.label10);
@@ -415,7 +420,7 @@ namespace ASCOM.DeepSkyDad.AF3
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(311, 45);
+            this.label13.Location = new System.Drawing.Point(311, 72);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(125, 13);
             this.label13.TabIndex = 45;
@@ -424,12 +429,12 @@ namespace ASCOM.DeepSkyDad.AF3
             // holdCurrentMultiplierNumeric
             // 
             this.holdCurrentMultiplierNumeric.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
-            this.holdCurrentMultiplierNumeric.Location = new System.Drawing.Point(444, 42);
+            this.holdCurrentMultiplierNumeric.Location = new System.Drawing.Point(444, 69);
             this.holdCurrentMultiplierNumeric.Name = "holdCurrentMultiplierNumeric";
             this.holdCurrentMultiplierNumeric.Size = new System.Drawing.Size(116, 20);
             this.holdCurrentMultiplierNumeric.TabIndex = 42;
             this.holdCurrentMultiplierNumeric.Value = new decimal(new int[] {
-            100,
+            40,
             0,
             0,
             0});
@@ -464,6 +469,30 @@ namespace ASCOM.DeepSkyDad.AF3
             this.chkTmpComp.Text = "Temperature compensation";
             this.chkTmpComp.UseVisualStyleBackColor = true;
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(311, 45);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(130, 13);
+            this.label7.TabIndex = 51;
+            this.label7.Text = "Move current multiplier (%)";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // moveCurrentMultiplierNumeric
+            // 
+            this.moveCurrentMultiplierNumeric.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
+            this.moveCurrentMultiplierNumeric.Location = new System.Drawing.Point(444, 42);
+            this.moveCurrentMultiplierNumeric.Name = "moveCurrentMultiplierNumeric";
+            this.moveCurrentMultiplierNumeric.Size = new System.Drawing.Size(116, 20);
+            this.moveCurrentMultiplierNumeric.TabIndex = 50;
+            this.moveCurrentMultiplierNumeric.Value = new decimal(new int[] {
+            80,
+            0,
+            0,
+            0});
+            this.moveCurrentMultiplierNumeric.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -495,6 +524,7 @@ namespace ASCOM.DeepSkyDad.AF3
             this.advancedPanel.ResumeLayout(false);
             this.advancedPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.holdCurrentMultiplierNumeric)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.moveCurrentMultiplierNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -534,5 +564,7 @@ namespace ASCOM.DeepSkyDad.AF3
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ComboBox comboBoxSpeedMode;
         private System.Windows.Forms.CheckBox chkTmpComp;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown moveCurrentMultiplierNumeric;
     }
 }

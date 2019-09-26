@@ -11,7 +11,7 @@ namespace TMC2208_n {
               internal_rsense : 1,
               en_spreadcycle : 1,
               shaft : 1,
-              index_otpw : 1, 
+              index_otpw : 1,
               index_step : 1,
               pdn_disable : 1,
               mstep_reg_select : 1,

@@ -91,8 +91,10 @@ namespace ASCOM.DeepSkyDad.AF3
         internal static string settleBufferDefault = "0";
         internal static string reverseDirectionProfileName = "Reverse direction";
         internal static string reverseDirectionDefault = "false";
+        internal static string motorMoveCurrentMultiplierName = "Move current multiplier (%)";
+        internal static string motorMoveCurrentMultiplierDefault = "80";
         internal static string motorHoldCurrentMultiplierName = "Hold current multiplier (%)";
-        internal static string motorHoldCurrentMultiplierDefault = "50";
+        internal static string motorHoldCurrentMultiplierDefault = "40";
         internal static string temperatureCompensationProfileName = "Temperature compensation";
         internal static string temperatureCompensationDefault = "false";
 
@@ -105,6 +107,7 @@ namespace ASCOM.DeepSkyDad.AF3
         internal static bool resetOnConnect;
         internal static bool setPositonOnConnect;
         internal static int setPositionOnConnectValue;
+        internal static int motorMoveCurrentMultiplier;
         internal static int motorHoldCurrentMultiplier;
         internal static int settleBuffer;
         internal static bool reverseDirection;
@@ -419,6 +422,7 @@ namespace ASCOM.DeepSkyDad.AF3
                     CommandString($"SMXM{maxMovement}");
                     CommandString($"SBUF{settleBuffer}");
                     CommandString($"SSPD{spd}");
+                    CommandString($"SMMM{motorMoveCurrentMultiplier}");
                     CommandString($"SMHM{motorHoldCurrentMultiplier}");
                 }
                 else
@@ -740,6 +744,7 @@ namespace ASCOM.DeepSkyDad.AF3
                 resetOnConnect = Convert.ToBoolean(driverProfile.GetValue(driverID, resetOnConnectProfileName, string.Empty, resetOnConnectDefault));
                 setPositonOnConnect = Convert.ToBoolean(driverProfile.GetValue(driverID, setPositonOnConnectProfileName, string.Empty, setPositonOnConnectDefault));
                 setPositionOnConnectValue = Convert.ToInt32(driverProfile.GetValue(driverID, setPositonOnConnectValueProfileName, string.Empty, setPositonOnConnectValueDefault)); ;
+                motorMoveCurrentMultiplier = Convert.ToInt32(driverProfile.GetValue(driverID, motorMoveCurrentMultiplierName, string.Empty, motorMoveCurrentMultiplierDefault));
                 motorHoldCurrentMultiplier = Convert.ToInt32(driverProfile.GetValue(driverID, motorHoldCurrentMultiplierName, string.Empty, motorHoldCurrentMultiplierDefault));
                 reverseDirection = Convert.ToBoolean(driverProfile.GetValue(driverID, reverseDirectionProfileName, string.Empty, reverseDirectionDefault));
                 settleBuffer = Convert.ToInt32(driverProfile.GetValue(driverID, settleBufferProfileName, string.Empty, settleBufferDefault));
@@ -765,6 +770,7 @@ namespace ASCOM.DeepSkyDad.AF3
                 driverProfile.WriteValue(driverID, resetOnConnectProfileName, resetOnConnect.ToString());
                 driverProfile.WriteValue(driverID, setPositonOnConnectProfileName, setPositonOnConnect.ToString());
                 driverProfile.WriteValue(driverID, setPositonOnConnectValueProfileName, setPositionOnConnectValue.ToString());
+                driverProfile.WriteValue(driverID, motorMoveCurrentMultiplierName, motorMoveCurrentMultiplier.ToString());
                 driverProfile.WriteValue(driverID, motorHoldCurrentMultiplierName, motorHoldCurrentMultiplier.ToString());
                 driverProfile.WriteValue(driverID, settleBufferProfileName, settleBuffer.ToString());
                 driverProfile.WriteValue(driverID, reverseDirectionProfileName, reverseDirection.ToString());

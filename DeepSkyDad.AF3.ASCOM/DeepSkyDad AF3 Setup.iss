@@ -8,7 +8,7 @@
 ;3. Add, enter "MsSign" for name
 ;4. Enter command "signtool.exe sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p" 
 SignTool=MsSign $f
-AppID={{10cc53ba-ec1f-4cca-8e95-62aa97be4f96}
+AppID={{13d23dd8-c0a2-495f-a9a2-b2573c231e0e}
 AppName=ASCOM DSD AF3 v1.0.0
 AppVerName=ASCOM DSD AF3 v1.0.0
 AppVersion=1.0.0

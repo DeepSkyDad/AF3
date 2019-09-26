@@ -49,7 +49,7 @@
 #define INIT2224_REGISTER(REG) TMC2224_n::REG##_t REG##_register = TMC2224_n::REG##_t
 #define SET_ALIAS(TYPE, DRIVER, NEW, ARG, OLD) TYPE (DRIVER::*NEW)(ARG) = &DRIVER::OLD
 
-#define TMCSTEPPER_VERSION 0x000500 // v0.5.0
+#define TMCSTEPPER_VERSION 0x000501 // v0.5.1
 
 class TMCStepper {
 	public:
@@ -813,7 +813,7 @@ class TMC2208Stepper : public TMCStepper {
 	  #ifdef TMC_SERIAL_SWITCH
 	    TMC2208Stepper(Stream * SerialPort, float RS, uint8_t addr, uint16_t mul_pin1, uint16_t mul_pin2);
 	  #endif
-		TMC2208Stepper(Stream * SerialPort, float RS, bool has_rx=true) :
+		TMC2208Stepper(Stream * SerialPort, float RS, bool) :
 			TMC2208Stepper(SerialPort, RS, TMC2208_SLAVE_ADDR)
 			{}
 		#if SW_CAPABLE_PLATFORM

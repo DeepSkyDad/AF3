@@ -38,6 +38,7 @@ namespace ASCOM.DeepSkyDad.AF3
             Focuser.setPositonOnConnect = chkSetPositionOnConnect.Checked;
             if(Focuser.setPositonOnConnect)
                 Focuser.setPositionOnConnectValue = (int)numericSetPositionOnConnectValue.Value;
+            Focuser.motorMoveCurrentMultiplier = (int)moveCurrentMultiplierNumeric.Value;
             Focuser.motorHoldCurrentMultiplier = (int)holdCurrentMultiplierNumeric.Value;
             Focuser.reverseDirection = chkReverseDirection.Checked;
             Focuser.settleBuffer = (int)numericUpDownSettleBuffer.Value;
@@ -91,6 +92,7 @@ namespace ASCOM.DeepSkyDad.AF3
                 comboBoxComPort.SelectedItem = Focuser.comPort;
             }
             chkTmpComp.Checked = Focuser.temperatureCompensation;
+            moveCurrentMultiplierNumeric.Value = Focuser.motorMoveCurrentMultiplier;
             holdCurrentMultiplierNumeric.Value = Focuser.motorHoldCurrentMultiplier;
             _suppressWarningMessageBox = false;
         }
@@ -202,6 +204,16 @@ namespace ASCOM.DeepSkyDad.AF3
                 this.Size = new Size(this.Size.Width + advancedPanel.Width, this.Height);
                
             }
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
