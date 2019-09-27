@@ -841,6 +841,10 @@ void executeCommand()
     _eepromSaveAfState = true;
     printSuccess();
   }
+    else if (strcmp("GREV", _command) == 0)
+  {
+    printResponse((int)_eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION]);
+  }
   else if (strcmp("SREV", _command) == 0)
   {
     setReverseDir(_commandParam);
@@ -875,6 +879,17 @@ void executeCommand()
   else if (strcmp("SIDE", _command) == 0)
   {
     setIdleEepromWriteMs(_commandParam);
+    _eepromSaveAfState = true;
+    printSuccess();
+  }
+   else if (strcmp("GMHM", _command) == 0)
+  {
+    printResponse((long)_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
+  }
+   else if (strcmp("SMHM", _command) == 0)
+  {
+    long multiplier = strtol(_commandParam, NULL, 10);
+    setMotorCurrent(_motorIMoveMultiplier, multiplier);
     _eepromSaveAfState = true;
     printSuccess();
   }
