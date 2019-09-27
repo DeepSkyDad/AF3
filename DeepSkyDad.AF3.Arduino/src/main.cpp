@@ -951,6 +951,8 @@ void executeCommand()
     Serial.println(_eepromAfState[EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER]);
     Serial.print("Motor current hold multiplier (%): ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER]);
+    Serial.print("HC/TP pin voltage: ");
+    Serial.println(readHcPin());
     Serial.print("Position: ");
     Serial.println(_eepromAfState[EEPROM_AF_STATE_POSITION]);
     Serial.print("Temperature: ");
