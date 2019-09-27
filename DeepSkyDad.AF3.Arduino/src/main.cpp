@@ -65,8 +65,8 @@ bool _eepromSaveAfState;
 #define MOTOR_SELECT_PIN_D5 5
 #define MOTOR_SELECT_PIN_D6 6
 
-#define MOTOR_I_14HS10_0404S_04A 440 //300
-#define MOTOR_I_14HS17_0504S_05A 440
+#define MOTOR_I_14HS10_0404S_04A 300
+#define MOTOR_I_14HS17_0504S_05A 480
 
 bool _motorIsMoving;
 bool _motorManualIsMoving;
@@ -464,12 +464,15 @@ int readHcButton()
 
 void autoDiscovery()
 {
-	static unsigned long lastAutoDiscovery = 0;
+	static unsigned long lastHCAutoDiscovery = 0;
+  static unsigned long lastTSAutoDiscovery = 0;
 	int x;
 
-	if (millis() - lastAutoDiscovery > 3000 || lastAutoDiscovery == 0)
+  long ms = millis();
+
+	if (ms - lastHCAutoDiscovery > 300 || lastHCAutoDiscovery == 0)
 	{
-		lastAutoDiscovery = millis();
+		lastHCAutoDiscovery = ms;
 
     // if currently no HC connected, first check if HC is connected here
     if (!_hcConnected)
@@ -482,6 +485,11 @@ void autoDiscovery()
         //Serial.println("HC detected!");
       }
     }
+  }
+
+  if (ms - lastTSAutoDiscovery > 5000 || lastTSAutoDiscovery == 0)
+	{
+		lastTSAutoDiscovery = ms;
 
     // we might have found HC, so recheck - if not found, continue with tempC sensor discovery if we don't have it already
     if (!_tsConnected)
@@ -967,8 +975,8 @@ void setup()
   pinMode(TMC220X_PIN_MS1, OUTPUT);
   pinMode(TMC220X_PIN_MS2, OUTPUT);
   pinMode(TMC220X_PIN_ENABLE, OUTPUT);
-  pinMode(MOTOR_SELECT_PIN_D5, INPUT);
-  pinMode(MOTOR_SELECT_PIN_D6, INPUT);
+  pinMode(MOTOR_SELECT_PIN_D5, INPUT_PULLUP);
+  pinMode(MOTOR_SELECT_PIN_D6, INPUT_PULLUP);
   pinMode(A0, INPUT);
 
   digitalWrite(TMC220X_PIN_DIR, LOW);
@@ -991,9 +999,9 @@ void setup()
   
   if(d5 == HIGH && d6 == HIGH) {
     _motorI = MOTOR_I_14HS10_0404S_04A;
-  } else if(d5 == HIGH && d6 == LOW) {
-    _motorI = MOTOR_I_14HS17_0504S_05A;
   } else if(d5 == LOW && d6 == HIGH) {
+    _motorI = MOTOR_I_14HS17_0504S_05A;
+  } else if(d5 == HIGH && d6 == LOW) {
     //TODO
   } else if(d5 == LOW && d6 == LOW) {
     //TODO
