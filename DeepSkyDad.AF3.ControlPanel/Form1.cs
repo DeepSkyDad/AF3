@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
@@ -35,6 +36,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private bool _isConnected;
         private bool _isUploadingFirmware;
+        private bool _isTesting;
 
         ///
         /// Handling the window messages
@@ -217,11 +219,16 @@ namespace DeepSkyDad.AF3.ControlPanel
             textBoxFirmwareFile.Enabled = !_isUploadingFirmware && !_isConnected;
             btnUpload.Enabled = !_isUploadingFirmware && !_isConnected;
 
+            motorTestStepsNumeric.Enabled = _isConnected && !_isTesting;
+            motorTestDurationNumeric.Enabled = _isConnected && !_isTesting;
+            motorTestStartBtn.Enabled = _isConnected && !_isTesting;
+            motorTestStopBtn.Enabled = _isConnected && _isTesting;
+
             foreach (Control c in groupBoxManualControl.Controls)
             {
                 if (c.GetType() == typeof(Label))
                     continue;
-                c.Enabled = _isConnected;
+                c.Enabled = _isConnected && !_isTesting;
             }
         }
 
@@ -229,7 +236,7 @@ namespace DeepSkyDad.AF3.ControlPanel
         {
             labelPosition.Text = "-";
             labelTemperature.Text = "-";
-            comboBoxStepMode.Text = null;
+            comboBoxStepMode.Text = "1/2";
             currentHoldMultiplierNumeric.Value = 0;
             currentMoveMultiplierNumeric.Value = 0;
             numericMoveAbsoluteSteps.Value = 0;
@@ -300,6 +307,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private async Task<bool> ReadPositionAndTemperature(bool isRefreshAbsolutePositionField = true, bool isOutputSerial = true)
         {
+            return true;
             if (!_isConnected)
                 return false;
 
@@ -531,6 +539,40 @@ namespace DeepSkyDad.AF3.ControlPanel
         private async void currentHoldMultiplierNumeric_ValueChanged(object sender, EventArgs e)
         {
             await _serialService.SendCommand($"[SMHM{currentHoldMultiplierNumeric.Value}]");
+        }
+
+        private async void motorTestStartBtn_Click(object sender, EventArgs e)
+        {
+            _isTesting = true;
+            RefreshUI();
+            var pos = Convert.ToInt32(await _serialService.SendCommand("[GPOS]"));
+            var factor = 1;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (_isTesting)
+            {
+                var target = pos + motorTestStepsNumeric.Value*factor;
+                factor *= -1;
+                await _serialService.SendCommand($"[STRG{target}]");
+                await _serialService.SendCommand("[SMOV]");
+
+                while(await _serialService.SendCommand("[GMOV]") == "1")
+                {
+                    await Task.Delay(500);
+                }
+
+                if(sw.Elapsed.TotalMinutes >= (double)motorTestDurationNumeric.Value)
+                {
+                    _isTesting = false;
+                    RefreshUI();
+                }
+            }
+        }
+
+        private void motorTestStopBtn_Click(object sender, EventArgs e)
+        {
+            _isTesting = false;
+            RefreshUI();
         }
     }
 

@@ -14,6 +14,7 @@ namespace DeepSkyDad.AF3.ControlPanel
         Action<SerialServiceStatus> _statusUpdateHandler;
         Action<string, bool> _outputTextHandler;
         bool _isCallOutputTextHandler;
+        static object _lockObj = new object();
 
         public enum SerialServiceStatus
         {
@@ -23,7 +24,6 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private SerialPort _port = null;
         private bool _portIsConnected = false;
-        private bool _commandExecuting = false;
         private string _currentResponse;
 
         public SerialService(Action<SerialServiceStatus> statusUpdateHandler, Action<string, bool> outputTextHandler)
@@ -59,7 +59,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                 _port.PortName = comPort;
                 _port.Open();
 
-                await Task.Delay(1000);
+                await Task.Delay(2000);
 
                 _portIsConnected = true;
                 _statusUpdateHandler(SerialServiceStatus.Connected);
@@ -91,57 +91,48 @@ namespace DeepSkyDad.AF3.ControlPanel
                 if (!_portIsConnected)
                     return null;
 
-                while (_commandExecuting)
-                    await Task.Delay(1);
-
-                _commandExecuting = true;
-                _port.DiscardOutBuffer();
-                _port.DiscardInBuffer();
-
-                try
-                {
-                    _currentResponse = string.Empty;
-                    _port.Write(cmd);
-                    if (isOutputSerial && _isCallOutputTextHandler)
-                        _outputTextHandler(cmd, false);
-                }
-                catch
+                lock(_lockObj)
                 {
                     _port.DiscardOutBuffer();
                     _port.DiscardInBuffer();
-                    _commandExecuting = false;
-                    throw;
-                }
 
-                if (waitResponse)
-                {
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
-                    while (_currentResponse?.EndsWith(")") != true)
+                    try
                     {
-                        if (sw.ElapsedMilliseconds > _port.ReadTimeout)
-                        {
-                            _port.DiscardOutBuffer();
-                            _port.DiscardInBuffer();
-                            _commandExecuting = false;
-                            throw new Exception($"Timed out while waiting for command {cmd} response");
-                        }
-                        else
-                        {
-                            await Task.Delay(1);
-                        }
+                        _currentResponse = string.Empty;
+                        _port.Write(cmd);
+                        if (isOutputSerial && _isCallOutputTextHandler)
+                            _outputTextHandler(cmd, false);
+                    }
+                    catch
+                    {
+                        _port.DiscardOutBuffer();
+                        _port.DiscardInBuffer();
+                        throw;
                     }
 
-                    _commandExecuting = false;
+                    if (waitResponse)
+                    {
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
+                        while (_currentResponse?.EndsWith(")") != true)
+                        {
+                            if (sw.ElapsedMilliseconds > _port.ReadTimeout)
+                            {
+                                _port.DiscardOutBuffer();
+                                _port.DiscardInBuffer();
+                                throw new Exception($"Timed out while waiting for command {cmd} response");
+                            }
+                            else
+                            {
+                                Thread.Sleep(1);
+                            }
+                        }
 
-                    if (isOutputSerial && _isCallOutputTextHandler)
-                        _outputTextHandler(_currentResponse, _currentResponse.StartsWith("(!"));
+                        if (isOutputSerial && _isCallOutputTextHandler)
+                            _outputTextHandler(_currentResponse, _currentResponse.StartsWith("(!"));
 
-                    return _currentResponse.Substring(1, _currentResponse.Length - 2);
-                }
-                else
-                {
-                    _commandExecuting = false;
+                        return _currentResponse.Substring(1, _currentResponse.Length - 2);
+                    }
                 }
 
                 return null;

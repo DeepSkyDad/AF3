@@ -70,6 +70,18 @@
             this.btnPlus180 = new System.Windows.Forms.Button();
             this.btnPlus90 = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.motorTestStartBtn = new System.Windows.Forms.Button();
+            this.motorTestStopBtn = new System.Windows.Forms.Button();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.motorTestDurationNumeric = new System.Windows.Forms.NumericUpDown();
+            this.motorTestStepsNumeric = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label9 = new System.Windows.Forms.Label();
+            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBoxFirmwareUpgrade.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBoxManualControl.SuspendLayout();
@@ -77,6 +89,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.currentMoveMultiplierNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericMoveAbsoluteSteps)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericMoveRelativeSteps)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.motorTestDurationNumeric)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.motorTestStepsNumeric)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.SuspendLayout();
             // 
             // comboComPort
@@ -104,7 +121,7 @@
             this.textBoxFirmwareFile.Location = new System.Drawing.Point(74, 27);
             this.textBoxFirmwareFile.Name = "textBoxFirmwareFile";
             this.textBoxFirmwareFile.ReadOnly = true;
-            this.textBoxFirmwareFile.Size = new System.Drawing.Size(517, 20);
+            this.textBoxFirmwareFile.Size = new System.Drawing.Size(224, 20);
             this.textBoxFirmwareFile.TabIndex = 2;
             // 
             // label1
@@ -168,7 +185,7 @@
             this.groupBoxFirmwareUpgrade.ForeColor = System.Drawing.SystemColors.Window;
             this.groupBoxFirmwareUpgrade.Location = new System.Drawing.Point(9, 42);
             this.groupBoxFirmwareUpgrade.Name = "groupBoxFirmwareUpgrade";
-            this.groupBoxFirmwareUpgrade.Size = new System.Drawing.Size(597, 97);
+            this.groupBoxFirmwareUpgrade.Size = new System.Drawing.Size(311, 97);
             this.groupBoxFirmwareUpgrade.TabIndex = 11;
             this.groupBoxFirmwareUpgrade.TabStop = false;
             this.groupBoxFirmwareUpgrade.Text = "FIRMWARE UPGRADE";
@@ -559,12 +576,150 @@
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.connectBtn_Click);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.motorTestStartBtn);
+            this.groupBox1.Controls.Add(this.motorTestStopBtn);
+            this.groupBox1.Controls.Add(this.label12);
+            this.groupBox1.Controls.Add(this.label11);
+            this.groupBox1.Controls.Add(this.motorTestDurationNumeric);
+            this.groupBox1.Controls.Add(this.motorTestStepsNumeric);
+            this.groupBox1.Controls.Add(this.label8);
+            this.groupBox1.Controls.Add(this.numericUpDown1);
+            this.groupBox1.Controls.Add(this.label9);
+            this.groupBox1.Controls.Add(this.numericUpDown2);
+            this.groupBox1.Controls.Add(this.checkBox1);
+            this.groupBox1.ForeColor = System.Drawing.SystemColors.Window;
+            this.groupBox1.Location = new System.Drawing.Point(326, 42);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(280, 97);
+            this.groupBox1.TabIndex = 139;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "MOTOR TEST";
+            // 
+            // motorTestStartBtn
+            // 
+            this.motorTestStartBtn.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.motorTestStartBtn.Location = new System.Drawing.Point(215, 27);
+            this.motorTestStartBtn.Name = "motorTestStartBtn";
+            this.motorTestStartBtn.Size = new System.Drawing.Size(59, 23);
+            this.motorTestStartBtn.TabIndex = 142;
+            this.motorTestStartBtn.Text = "START";
+            this.motorTestStartBtn.UseVisualStyleBackColor = true;
+            this.motorTestStartBtn.Click += new System.EventHandler(this.motorTestStartBtn_Click);
+            // 
+            // motorTestStopBtn
+            // 
+            this.motorTestStopBtn.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.motorTestStopBtn.Location = new System.Drawing.Point(215, 61);
+            this.motorTestStopBtn.Name = "motorTestStopBtn";
+            this.motorTestStopBtn.Size = new System.Drawing.Size(59, 23);
+            this.motorTestStopBtn.TabIndex = 139;
+            this.motorTestStopBtn.Text = "STOP";
+            this.motorTestStopBtn.UseVisualStyleBackColor = true;
+            this.motorTestStopBtn.Click += new System.EventHandler(this.motorTestStopBtn_Click);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 63);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(34, 13);
+            this.label12.TabIndex = 141;
+            this.label12.Text = "Steps";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 29);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(72, 13);
+            this.label11.TabIndex = 139;
+            this.label11.Text = "Duration (min)";
+            // 
+            // motorTestDurationNumeric
+            // 
+            this.motorTestDurationNumeric.Location = new System.Drawing.Point(85, 28);
+            this.motorTestDurationNumeric.Maximum = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.motorTestDurationNumeric.Name = "motorTestDurationNumeric";
+            this.motorTestDurationNumeric.Size = new System.Drawing.Size(124, 20);
+            this.motorTestDurationNumeric.TabIndex = 140;
+            this.motorTestDurationNumeric.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // motorTestStepsNumeric
+            // 
+            this.motorTestStepsNumeric.Location = new System.Drawing.Point(85, 61);
+            this.motorTestStepsNumeric.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.motorTestStepsNumeric.Name = "motorTestStepsNumeric";
+            this.motorTestStepsNumeric.Size = new System.Drawing.Size(124, 20);
+            this.motorTestStepsNumeric.TabIndex = 139;
+            this.motorTestStepsNumeric.Value = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(444, 53);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(124, 13);
+            this.label8.TabIndex = 138;
+            this.label8.Text = "Current hold multiplier (%)";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(447, 73);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(127, 20);
+            this.numericUpDown1.TabIndex = 137;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(308, 52);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(130, 13);
+            this.label9.TabIndex = 136;
+            this.label9.Text = "Current move multiplier (%)";
+            // 
+            // numericUpDown2
+            // 
+            this.numericUpDown2.Location = new System.Drawing.Point(311, 72);
+            this.numericUpDown2.Name = "numericUpDown2";
+            this.numericUpDown2.Size = new System.Drawing.Size(127, 20);
+            this.numericUpDown2.TabIndex = 135;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(466, 25);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(109, 17);
+            this.checkBox1.TabIndex = 130;
+            this.checkBox1.Text = "Reverse direction";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(995, 442);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.comboComPort);
             this.Controls.Add(this.groupBoxManualControl);
             this.Controls.Add(this.btnExit);
@@ -588,6 +743,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.currentMoveMultiplierNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericMoveAbsoluteSteps)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericMoveRelativeSteps)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.motorTestDurationNumeric)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.motorTestStepsNumeric)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -637,6 +798,18 @@
         private System.Windows.Forms.NumericUpDown currentMoveMultiplierNumeric;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.NumericUpDown currentHoldMultiplierNumeric;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button motorTestStartBtn;
+        private System.Windows.Forms.Button motorTestStopBtn;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.NumericUpDown motorTestDurationNumeric;
+        private System.Windows.Forms.NumericUpDown motorTestStepsNumeric;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

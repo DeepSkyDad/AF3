@@ -92,7 +92,7 @@ namespace ASCOM.DeepSkyDad.AF3
         internal static string reverseDirectionProfileName = "Reverse direction";
         internal static string reverseDirectionDefault = "false";
         internal static string motorMoveCurrentMultiplierName = "Move current multiplier (%)";
-        internal static string motorMoveCurrentMultiplierDefault = "80";
+        internal static string motorMoveCurrentMultiplierDefault = "90";
         internal static string motorHoldCurrentMultiplierName = "Hold current multiplier (%)";
         internal static string motorHoldCurrentMultiplierDefault = "40";
         internal static string temperatureCompensationProfileName = "Temperature compensation";

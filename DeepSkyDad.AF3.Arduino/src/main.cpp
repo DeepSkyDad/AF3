@@ -46,7 +46,7 @@
 
 long _eepromAfState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
 long _eepromAfPrevState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
-long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 3, 0, 180000, 0, 80, 40, 0};
+long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 3, 0, 180000, 0, 90, 40, 0};
 int _eepromAfStatePropertyCount = sizeof(_eepromAfState) / sizeof(long);
 int _eepromAfStateAddressSize = sizeof(_eepromAfState);
 int _eepromAfStateAdressesCount = EEPROMSizeATmega328 / _eepromAfStateAddressSize;
@@ -66,7 +66,7 @@ bool _eepromSaveAfState;
 #define MOTOR_SELECT_PIN_D6 6
 
 #define MOTOR_I_14HS10_0404S_04A 300
-#define MOTOR_I_14HS17_0504S_05A 480
+#define MOTOR_I_14HS17_0504S_05A 460
 
 bool _motorIsMoving;
 bool _motorManualIsMoving;
@@ -251,7 +251,7 @@ void startMotor() {
   switch (_eepromAfState[EEPROM_AF_STATE_SPEED_MODE])
   {
     case 1:
-        _motorSpeedFactor = 30;
+        _motorSpeedFactor = 40;
         break;
     case 2:
         _motorSpeedFactor = 12;
@@ -401,7 +401,7 @@ bool initUART() {
   _driver.mstep_reg_select(true); //enable microstep selection over UART
   _driver.I_scale_analog(false); //disable Vref scaling
   writeStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE]);
-  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 1 or 2 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
+  _driver.blank_time(24); //Comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. Choose a setting of 24 or 32 for typical applications. For higher capacitive loads, 3 may be required. Lower settings allow stealthChop to regulate down to lower coil current values. 
   _driver.toff(5); //enable stepper driver (For operation with stealthChop, this parameter is not used, but >0 is required to enable the motor)
   _driver.intpol(true); //use interpolation
   _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
@@ -771,10 +771,12 @@ void executeCommand()
   else if (strcmp("SMOV", _command) == 0)
   {
     startMotor();
+    printSuccess();
   }
   else if (strcmp("STOP", _command) == 0)
   {
     stopMotor();
+    printSuccess();
   }
   else if (strcmp("GMXP", _command) == 0)
   {
@@ -926,6 +928,18 @@ void executeCommand()
   else if (strcmp("GTMC", _command) == 0)
   {
     printResponse(_temperatureCelsius);
+  }
+  else if (strcmp("SHST", _command) == 0)
+  {
+     long start = strtol(_commandParam, NULL, 10);
+    _driver.hysteresis_start(start);
+    printSuccess();
+  }
+  else if (strcmp("SHEN", _command) == 0)
+  {
+    long end = strtol(_commandParam, NULL, 10);
+    _driver.hysteresis_end(end);
+    printSuccess();
   }
   else if (strcmp("DEBG", _command) == 0)
   {
