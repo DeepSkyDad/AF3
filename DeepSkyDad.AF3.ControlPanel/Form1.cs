@@ -287,16 +287,22 @@ namespace DeepSkyDad.AF3.ControlPanel
             switch (speedMode)
             {
                 case "1":
-                    speedMode = "Low";
+                    speedMode = "Very slow";
                     break;
                 case "2":
-                    speedMode = "Medium";
+                    speedMode = "Slow";
                     break;
                 case "3":
-                    speedMode = "High";
+                    speedMode = "Medium";
+                    break;
+                case "4":
+                    speedMode = "Fast";
+                    break;
+                case "5":
+                    speedMode = "Very fast";
                     break;
                 default:
-                    speedMode = "Low";
+                    speedMode = "Slow";
                     break;
             }
             comboBoxSpeedMode.Text = speedMode;
@@ -426,7 +432,7 @@ namespace DeepSkyDad.AF3.ControlPanel
             switch (comboBoxStepMode.Text)
             {
                 case "1":
-                    stepMode = "1";
+                    stepMode = "0";
                     break;
                 case "1/2":
                     stepMode = "2";
@@ -464,14 +470,20 @@ namespace DeepSkyDad.AF3.ControlPanel
             string speedMode;
             switch (comboBoxSpeedMode.Text)
             {
-                case "Low":
+                case "Very slow":
                     speedMode = "1";
                     break;
-                case "Medium":
+                case "Slow":
                     speedMode = "2";
                     break;
-                case "High":
+                case "Medium":
                     speedMode = "3";
+                    break;
+                case "Fast":
+                    speedMode = "4";
+                    break;
+                case "Very fast":
+                    speedMode = "5";
                     break;
                 default:
                     speedMode = "1";
@@ -545,13 +557,14 @@ namespace DeepSkyDad.AF3.ControlPanel
         {
             _isTesting = true;
             RefreshUI();
-            var pos = Convert.ToInt32(await _serialService.SendCommand("[GPOS]"));
+            var pos = Convert.ToInt32(await _serialService.SendCommand("[GPOS]")) + motorTestStepsNumeric.Value;
             var factor = 1;
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
             while (_isTesting)
             {
-                var target = pos + motorTestStepsNumeric.Value*factor;
+                var target = pos + motorTestStepsNumeric.Value * factor;
                 factor *= -1;
                 await _serialService.SendCommand($"[STRG{target}]");
                 await _serialService.SendCommand("[SMOV]");

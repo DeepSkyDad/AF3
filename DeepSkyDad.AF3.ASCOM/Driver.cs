@@ -76,7 +76,7 @@ namespace ASCOM.DeepSkyDad.AF3
         internal static string stepSizeProfileName = "Step size";
         internal static string stepSizeDefault = "1/2";
         internal static string speedModeProfileName = "Speed mode";
-        internal static string speedModeDefaultValue = "Medium";
+        internal static string speedModeDefaultValue = "Slow";
         internal static string maxPositionProfileName = "Maximum positions";
         internal static string maxPositionDefault = "1000000";
         internal static string maxMovementProfileName = "Maximum movement";
@@ -367,7 +367,7 @@ namespace ASCOM.DeepSkyDad.AF3
                     var ss = 2;
                     if (stepSize == "1")
                     {
-                        ss = 0;
+                        ss = 1;
                     }
                     else if (stepSize == "1/2")
                     {
@@ -403,7 +403,11 @@ namespace ASCOM.DeepSkyDad.AF3
                     }
 
                     var spd = 3;
-                    if (speedMode == "Low")
+                    if (speedMode == "Very slow")
+                    {
+                        spd = 1;
+                    }
+                    else if (speedMode == "Slow")
                     {
                         spd = 1;
                     }
@@ -411,9 +415,13 @@ namespace ASCOM.DeepSkyDad.AF3
                     {
                         spd = 2;
                     }
-                    else if (stepSize == "High")
+                    else if (speedMode == "Fast")
                     {
-                        spd = 3;
+                        spd = 4;
+                    }
+                    else if (speedMode == "Very fast")
+                    {
+                        spd = 5;
                     }
 
                     CommandString($"SSTP{ss}");

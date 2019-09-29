@@ -17,6 +17,7 @@
     If command results in error, response starts with ! and ends with ), containing error code. List of error codes:
       100 - command not found
       101 - relative movement bigger from max. movement
+      102 - invalid step mode
       999 - UART not initalized (check motor power)
     The actual set of required commands is based on ASCOM IFocuserV3 interface, for more check:
     https://ascom-standards.org/Help/Platform/html/T_ASCOM_DeviceInterface_IFocuserV3.htm
@@ -46,7 +47,7 @@
 
 long _eepromAfState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
 long _eepromAfPrevState[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9999};
-long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 3, 0, 180000, 0, 90, 40, 0};
+long _eepromAfStateDefault[] = {500000, 1000000, 50000, 2, 2, 0, 180000, 0, 90, 40, 0};
 int _eepromAfStatePropertyCount = sizeof(_eepromAfState) / sizeof(long);
 int _eepromAfStateAddressSize = sizeof(_eepromAfState);
 int _eepromAfStateAdressesCount = EEPROMSizeATmega328 / _eepromAfStateAddressSize;
@@ -66,7 +67,7 @@ bool _eepromSaveAfState;
 #define MOTOR_SELECT_PIN_D6 6
 
 #define MOTOR_I_14HS10_0404S_04A 300
-#define MOTOR_I_14HS17_0504S_05A 460
+#define MOTOR_I_14HS17_0504S_05A 400
 
 bool _motorIsMoving;
 bool _motorManualIsMoving;
@@ -79,7 +80,7 @@ unsigned long _motorTargetPosition;
 unsigned long _motorSettleBufferPrevMs;
 unsigned long _motorIsMovingLastRunMs;
 unsigned long _motorLastMoveEepromMs;
-long _motorSpeedFactor;
+long _motorMoveDelay;
 long _motorI;
 long _motorIMoveMultiplier;
 long _motorIHoldMultiplier;
@@ -251,18 +252,23 @@ void startMotor() {
   switch (_eepromAfState[EEPROM_AF_STATE_SPEED_MODE])
   {
     case 1:
-        _motorSpeedFactor = 40;
+        _motorMoveDelay = 96000;
         break;
     case 2:
-        _motorSpeedFactor = 12;
+        _motorMoveDelay = 48000;
         break;
     case 3:
-        _motorSpeedFactor = 1;
+        _motorMoveDelay = 24000;
         break;
-    default:
-        _motorSpeedFactor = 1;
+    case 4:
+        _motorMoveDelay = 8000;
+        break;
+    case 5:
+        _motorMoveDelay = 1600;
         break;
   }
+
+  _motorMoveDelay /= _eepromAfState[EEPROM_AF_STATE_STEP_MODE];
 }
 
 void stopMotor()
@@ -277,22 +283,23 @@ void stopMotor()
   _motorTargetPosition = _eepromAfState[EEPROM_AF_STATE_POSITION];
 }
 
-void writeStepMode(int sm)
+bool writeStepMode(int sm)
 {
-  //select microsteps (0,2,4,8,16,32,64,128,256)
-  if (sm != 0 && sm != 2 && sm != 4 && sm != 8 && sm != 16 && sm != 32 && sm != 64 && sm != 128 && sm != 256)
+  if (sm != 1 && sm != 2 && sm != 4 && sm != 8 && sm != 16 && sm != 32 && sm != 64 && sm != 128 && sm != 256)
   {
-    return;
+    return false;
   }
 
-  _driver.microsteps(sm); 
+  //select microsteps (0,2,4,8,16,32,64,128,256)
+  _driver.microsteps(sm == 1 ? 0 : sm); 
   _eepromAfState[EEPROM_AF_STATE_STEP_MODE] = sm;
+  return true;
 }
 
 void setSpeedMode(char param[])
 {
   long speedMode = strtol(param, NULL, 10);
-  if (speedMode != 1 && speedMode != 2 && speedMode != 3)
+  if (speedMode != 1 && speedMode != 2 && speedMode != 3 && speedMode != 4 && speedMode != 5)
   {
     return;
   }
@@ -384,7 +391,7 @@ void setMotorCurrent(int moveMultiplier, int holdMultiplier)
   //Serial.print(", Hold multiplier: ");
   //Serial.println(multiplier);
 
-  _driver.rms_current(mA, multiplier);
+  _driver.rms_current(mA, multiplier*0.8); // set hold multiplier to maximum of 80% of motor move current
   _eepromAfState[EEPROM_AF_STATE_MOTOR_I_MOVE_MULTIPLIER] = moveMultiplier;
   _eepromAfState[EEPROM_AF_STATE_MOTOR_I_HOLD_MULTIPLIER] = holdMultiplier;
 }
@@ -805,9 +812,12 @@ void executeCommand()
   else if (strcmp("SSTP", _command) == 0)
   {
     long sm = strtol(_commandParam, NULL, 10);
-    writeStepMode(sm);
-    _eepromSaveAfState = true;
-    printSuccess();
+    if(writeStepMode(sm)) {
+       _eepromSaveAfState = true;
+      printSuccess();
+    } else {
+      printResponseErrorCode(102); 
+    }
   }
   else if (strcmp("GSPD", _command) == 0)
   {
@@ -1067,19 +1077,19 @@ void loop()
       {
         digitalWrite(TMC220X_PIN_DIR, _eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION] == 0 ? LOW : HIGH);
         digitalWrite(TMC220X_PIN_STEP, 1);
-        delayMicroseconds(1);
+        delayMicroseconds(100);
         digitalWrite(TMC220X_PIN_STEP, 0);
         _eepromAfState[EEPROM_AF_STATE_POSITION]--;
-        delayMicroseconds(1600 / _eepromAfState[EEPROM_AF_STATE_STEP_MODE] * _motorSpeedFactor);
+        delayMicroseconds(_motorMoveDelay);
       }
       else if (_motorTargetPosition > (unsigned long)_eepromAfState[EEPROM_AF_STATE_POSITION])
       {
         digitalWrite(TMC220X_PIN_DIR, _eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION] == 0 ? HIGH : LOW);
         digitalWrite(TMC220X_PIN_STEP, 1);
-        delayMicroseconds(1);
+        delayMicroseconds(100);
         digitalWrite(TMC220X_PIN_STEP, 0);
         _eepromAfState[EEPROM_AF_STATE_POSITION]++;
-        delayMicroseconds(1600 / _eepromAfState[EEPROM_AF_STATE_STEP_MODE] * _motorSpeedFactor);
+        delayMicroseconds(_motorMoveDelay);
       }
       else
       {

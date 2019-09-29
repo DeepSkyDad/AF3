@@ -413,13 +413,16 @@ namespace ASCOM.DeepSkyDad.AF3
             // 
             this.comboBoxSpeedMode.FormattingEnabled = true;
             this.comboBoxSpeedMode.Items.AddRange(new object[] {
-            "Low",
+            "Very slow",
+            "Slow",
             "Medium",
-            "High"});
+            "Fast",
+            "Very fast"});
             this.comboBoxSpeedMode.Location = new System.Drawing.Point(175, 68);
             this.comboBoxSpeedMode.Name = "comboBoxSpeedMode";
             this.comboBoxSpeedMode.Size = new System.Drawing.Size(121, 21);
             this.comboBoxSpeedMode.TabIndex = 48;
+            this.comboBoxSpeedMode.SelectedIndexChanged += new System.EventHandler(this.comboBoxSpeedMode_SelectedIndexChanged);
             // 
             // label10
             // 

@@ -331,9 +331,11 @@
             this.comboBoxSpeedMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSpeedMode.FormattingEnabled = true;
             this.comboBoxSpeedMode.Items.AddRange(new object[] {
-            "Low",
+            "Very slow",
+            "Slow",
             "Medium",
-            "High"});
+            "Fast",
+            "Very fast"});
             this.comboBoxSpeedMode.Location = new System.Drawing.Point(172, 71);
             this.comboBoxSpeedMode.Name = "comboBoxSpeedMode";
             this.comboBoxSpeedMode.Size = new System.Drawing.Size(126, 21);
@@ -454,7 +456,7 @@
             // 
             this.numericMoveRelativeSteps.Location = new System.Drawing.Point(384, 208);
             this.numericMoveRelativeSteps.Maximum = new decimal(new int[] {
-            5000,
+            100000,
             0,
             0,
             0});
@@ -658,7 +660,7 @@
             // 
             this.motorTestStepsNumeric.Location = new System.Drawing.Point(85, 61);
             this.motorTestStepsNumeric.Maximum = new decimal(new int[] {
-            10000,
+            100000,
             0,
             0,
             0});

@@ -215,5 +215,10 @@ namespace ASCOM.DeepSkyDad.AF3
         {
 
         }
+
+        private void comboBoxSpeedMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
