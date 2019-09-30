@@ -18,6 +18,7 @@
       100 - command not found
       101 - relative movement bigger from max. movement
       102 - invalid step mode
+      103 - invalid speed mode
       999 - UART not initalized (check motor power)
     The actual set of required commands is based on ASCOM IFocuserV3 interface, for more check:
     https://ascom-standards.org/Help/Platform/html/T_ASCOM_DeviceInterface_IFocuserV3.htm
@@ -296,16 +297,17 @@ bool writeStepMode(int sm)
   return true;
 }
 
-void setSpeedMode(char param[])
+bool setSpeedMode(char param[])
 {
   long speedMode = strtol(param, NULL, 10);
   if (speedMode != 1 && speedMode != 2 && speedMode != 3 && speedMode != 4 && speedMode != 5)
   {
-    return;
+    return false;
   }
   else
   {
      _eepromAfState[EEPROM_AF_STATE_SPEED_MODE] = speedMode;
+     return true;
   }
 }
 
@@ -825,9 +827,12 @@ void executeCommand()
   }
   else if (strcmp("SSPD", _command) == 0)
   {
-    setSpeedMode(_commandParam);
-    _eepromSaveAfState = true;
-    printSuccess();
+    if(setSpeedMode(_commandParam)) {
+      _eepromSaveAfState = true;
+      printSuccess();
+    } else {
+      printResponseErrorCode(103);
+    }
   }
   else if (strcmp("RSET", _command) == 0)
   {
