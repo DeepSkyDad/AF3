@@ -542,11 +542,7 @@ namespace ASCOM.DeepSkyDad.AF3
         {
             get
             {
-                if(maxIncrement == null)
-                {
-                    maxIncrement = (int)CommandLong("GMXM");
-                }
-               
+                maxIncrement = (int)CommandLong("GMXM");
                 tl.LogMessage("MaxIncrement Get", maxIncrement.ToString());
                 return (int)maxIncrement; // Maximum change in one move
             }
@@ -569,7 +565,7 @@ namespace ASCOM.DeepSkyDad.AF3
         public void Move(int position)
         {
             CommandString($"STRG{position.ToString()}");
-            CommandBlind("SMOV");
+            CommandString("SMOV");
             tl.LogMessage("Move", position.ToString());
             focuserPosition = position; // Set the focuser position
         }

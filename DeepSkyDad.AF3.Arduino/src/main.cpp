@@ -74,9 +74,7 @@ bool _motorIsMoving;
 bool _motorManualIsMoving;
 bool _motorManualIsMovingContinuous;
 bool _motorManualIsMovingContinuousDir;
-bool _motorManualIsCoarse = true;
-int _motorManualFineSteps = 10;
-int _motorManualCoarseSteps = 500;
+int _motorManualSteps = 100;
 unsigned long _motorTargetPosition;
 unsigned long _motorSettleBufferPrevMs;
 unsigned long _motorIsMovingLastRunMs;
@@ -265,7 +263,7 @@ void startMotor() {
         _motorMoveDelay = 8000;
         break;
     case 5:
-        _motorMoveDelay = 1600;
+        _motorMoveDelay = 4000;
         break;
   }
 
@@ -521,7 +519,7 @@ void handleHC()
 	static unsigned long btnUpPressed = 0;
 	static unsigned long btnDownPressed = 0;
 	static unsigned long lastRun = 0;
-	static bool stepSizeChanged = false;
+	static bool stepChange = false;
 	static bool moveCanceled = false;
 
   //Serial.println("Handle HC");
@@ -547,23 +545,23 @@ void handleHC()
 			{
         _motorManualIsMoving = true;
         _motorManualIsMovingContinuous = false;
-        setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] + (_motorManualIsCoarse ? _motorManualCoarseSteps : _motorManualFineSteps));
+        setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] + _motorManualSteps);
         startMotor();
 			}
 			else if (!moveCanceled && btnDownPressed != 0 && lastRun - btnDownPressed <= HC_CONTINUOUS_MOVE_TIMEOUT_MS)
 			{
         _motorManualIsMoving = true;
         _motorManualIsMovingContinuous = false;
-        setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] - (_motorManualIsCoarse ? _motorManualCoarseSteps : _motorManualFineSteps));
+        setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] - _motorManualSteps);
         startMotor();
 			}
 
-			stepSizeChanged = false;
+			stepChange = false;
 			moveCanceled = false;
 			btnUpPressed = 0;
 			btnDownPressed = 0;
 		}
-		else if (!stepSizeChanged)
+		else if (!stepChange)
 		{
 			if (btn_val == HC_BTN_BOTH)
 			{
@@ -572,8 +570,11 @@ void handleHC()
 
 				btnUpPressed = 0;
 				btnDownPressed = 0;
-				stepSizeChanged = true;
-        _motorManualIsCoarse = !_motorManualIsCoarse;
+				stepChange = true;
+        int newSm =  _eepromAfState[EEPROM_AF_STATE_STEP_MODE] * 2;
+        if(newSm > 256)
+          newSm = 1;
+        writeStepMode(newSm);
 			}
 			else if (btn_val == HC_BTN_UP)
 			{
@@ -1082,7 +1083,7 @@ void loop()
       {
         digitalWrite(TMC220X_PIN_DIR, _eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION] == 0 ? LOW : HIGH);
         digitalWrite(TMC220X_PIN_STEP, 1);
-        delayMicroseconds(100);
+        delayMicroseconds(1);
         digitalWrite(TMC220X_PIN_STEP, 0);
         _eepromAfState[EEPROM_AF_STATE_POSITION]--;
         delayMicroseconds(_motorMoveDelay);
@@ -1091,7 +1092,7 @@ void loop()
       {
         digitalWrite(TMC220X_PIN_DIR, _eepromAfState[EEPROM_AF_STATE_REVERSE_DIRECTION] == 0 ? HIGH : LOW);
         digitalWrite(TMC220X_PIN_STEP, 1);
-        delayMicroseconds(100);
+        delayMicroseconds(1);
         digitalWrite(TMC220X_PIN_STEP, 0);
         _eepromAfState[EEPROM_AF_STATE_POSITION]++;
         delayMicroseconds(_motorMoveDelay);
