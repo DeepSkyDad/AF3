@@ -67,7 +67,7 @@ bool _eepromSaveAfState;
 #define MOTOR_SELECT_PIN_D5 5
 #define MOTOR_SELECT_PIN_D6 6
 
-#define MOTOR_I_14HS10_0404S_04A 300
+#define MOTOR_I_14HS10_0404S_04A 240
 #define MOTOR_I_14HS17_0504S_05A 400
 
 bool _motorIsMoving;

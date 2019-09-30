@@ -566,7 +566,9 @@ namespace DeepSkyDad.AF3.ControlPanel
             {
                 var target = pos + motorTestStepsNumeric.Value * factor;
                 factor *= -1;
-                await _serialService.SendCommand($"[STRG{target}]");
+                var result = await _serialService.SendCommand($"[STRG{target}]");
+                if (result == "101")
+                    break;
                 await _serialService.SendCommand("[SMOV]");
 
                 while(await _serialService.SendCommand("[GMOV]") == "1")
