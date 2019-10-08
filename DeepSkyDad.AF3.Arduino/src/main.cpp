@@ -747,6 +747,31 @@ void printResponseErrorCode(int code)
 
 void executeCommand()
 {
+    if (strcmp("LEGT", _command) == 0)
+    {
+        Serial.println("LEGACY MODE - START");
+        digitalWrite(TMC220X_PIN_ENABLE, LOW);
+        Serial.println("ENABLE LOW");
+       
+        Serial.println("MOVING STARTED");
+        for(int i=0;i<500;i++) {
+            digitalWrite(TMC220X_PIN_DIR, LOW);
+            digitalWrite(TMC220X_PIN_STEP, 1);
+            delayMicroseconds(1);
+            digitalWrite(TMC220X_PIN_STEP, 0);
+            delayMicroseconds(8000);
+        }
+         Serial.println("MOVING FINISHED");
+
+        digitalWrite(TMC220X_PIN_ENABLE, HIGH);
+        Serial.println("ENABLE HIGH");
+
+        Serial.println("LEGACY MODE - END");
+
+        printSuccess();
+        return;
+    }
+
     if(!_motorUARTInitialized) {
         printResponseErrorCode(999);
         return;
