@@ -368,8 +368,6 @@ namespace ASCOM.DeepSkyDad.AF3
                         focuserPosition = (int)CommandLong("GPOS");
                     }
 
-                    focuserPosition = (int)CommandLong("GPOS");
-
                     var ss = 2;
                     if (stepSize == "1")
                     {
