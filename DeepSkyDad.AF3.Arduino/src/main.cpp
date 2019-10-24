@@ -113,7 +113,7 @@ TMC2208Stepper _driver = TMC2208Stepper(TMC220X_PIN_UART_RX, TMC220X_PIN_UART_TX
 #define HC_BTN_BOTH 3
 
 #define HC_CONTINUOUS_MOVE_TIMEOUT_MS 500
-#define HC_STEP_CHANGE_REVERSE_TIMEOUT_MS 500
+#define HC_STEP_CHANGE_RESET_TIMEOUT_MS 1000
 
 OneWire _ds = OneWire(HC_PIN);
 DallasTemperature _sensors = DallasTemperature(&_ds);
@@ -414,10 +414,10 @@ void setMotorCurrent(int moveMultiplier, int holdMultiplier)
 bool initUART() {
     _driver.begin();
 
-    if (_driver.test_connection()) {
-            return false;
+    if (_driver.test_connection() != 0) {
+        return false;
     }
-    
+
     _driver.pdn_disable(true); //enable UART
     setMotorCurrent((int)_motorIMoveMultiplier, (int)_motorIHoldMultiplier);
     _driver.mstep_reg_select(true); //enable microstep selection over UART
@@ -428,6 +428,7 @@ bool initUART() {
     _driver.intpol(true); //use interpolation
     _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
     digitalWrite(TMC220X_PIN_ENABLE, LOW); //enable coils
+       
     _motorUARTInitialized = true;
     return true;
 }
@@ -535,7 +536,7 @@ void handleHC()
     static unsigned long btnDownPressed = 0;
     static unsigned long btnBothPressed = 0;
     static unsigned long lastRun = 0;
-    static bool stepChange = false;
+    static long stepChange = 0;
 
     //Serial.println("Handle HC");
 
@@ -548,66 +549,35 @@ void handleHC()
 
         int btn_val = readHcButton();
 
-        if (btn_val <= 0)
-        {
-            //Serial.println("HC RELEASED");
-            //buttons released
-            if (_motorManualIsMovingContinuous)
+        if(stepChange == 0) {
+            if (btn_val <= 0)
             {
-                stopMotor();
-            }
-            else if (btnUpPressed != 0 && lastRun - btnUpPressed <= HC_CONTINUOUS_MOVE_TIMEOUT_MS)
-            {
-                _motorManualIsMoving = true;
-                setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] + _motorManualSteps);
-                writeManualStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL]);
-                startMotor();
-            }
-            else if (btnDownPressed != 0 && lastRun - btnDownPressed <= HC_CONTINUOUS_MOVE_TIMEOUT_MS)
-            {
-                _motorManualIsMoving = true;
-                setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] - _motorManualSteps);
-                writeManualStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL]);
-                startMotor();
-            } else if(btnBothPressed != 0) {
-                int newSm = _eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL];
-                if(lastRun - btnBothPressed < HC_STEP_CHANGE_REVERSE_TIMEOUT_MS) {
-                    if(newSm < 256) {
-                         newSm*=2;
-                    }
-                    //Serial.print("STEP INCREASE TO");
-                    //Serial.println(newSm);
-                } else {
-                    if(newSm > 1) {
-                         newSm/=2;
-                    }
-                    //Serial.print("STEP DECREASE TO");
-                    //Serial.println(newSm);
+                if (_motorManualIsMovingContinuous)
+                {
+                    stopMotor();
+                }
+                else if (btnUpPressed != 0 && lastRun - btnUpPressed <= HC_CONTINUOUS_MOVE_TIMEOUT_MS)
+                {
+                    _motorManualIsMoving = true;
+                    setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] + _motorManualSteps);
+                    writeManualStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL]);
+                    startMotor();
+                }
+                else if (btnDownPressed != 0 && lastRun - btnDownPressed <= HC_CONTINUOUS_MOVE_TIMEOUT_MS)
+                {
+                    _motorManualIsMoving = true;
+                    setTargetPosition(_eepromAfState[EEPROM_AF_STATE_POSITION] - _motorManualSteps);
+                    writeManualStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL]);
+                    startMotor();
                 }
 
-                writeManualStepMode(newSm);
-                _eepromSaveAfState = true;
-            }
-
-            stepChange = false;
-            btnUpPressed = 0;
-            btnDownPressed = 0;
-            btnBothPressed = 0;
-        }
-        else if (!stepChange)
-        {
-            if (btn_val == HC_BTN_BOTH)
-            {
-                stopMotor();
+                stepChange = false;
                 btnUpPressed = 0;
                 btnDownPressed = 0;
-                btnBothPressed = millis();
-                stepChange = true;
+                btnBothPressed = 0;
             }
             else if (btn_val == HC_BTN_UP)
             {
-                //Serial.println("HC UP");
-                //button up
                 if (_motorManualIsMoving && !_motorManualIsMovingContinuous)
                 {
                     stopMotor();
@@ -630,9 +600,6 @@ void handleHC()
             }
             else if (btn_val == HC_BTN_DOWN)
             {
-                //Serial.println("HC DOWN");
-                //button down
-             
                 if (_motorManualIsMoving && !_motorManualIsMovingContinuous)
                 {
                     stopMotor();
@@ -649,9 +616,33 @@ void handleHC()
                     _motorManualIsMoving = true;
                     _motorManualIsMovingContinuousDir = false;
                     _motorManualIsMovingContinuous = true;
+                    writeManualStepMode(_eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL]);
                     startMotor();
                 }
             }
+            else if (btn_val == HC_BTN_BOTH)
+            {
+                stopMotor();
+                btnUpPressed = 0;
+                btnDownPressed = 0;
+                btnBothPressed = millis();
+                stepChange = 1;
+            }
+        } else if(stepChange == 1 && btn_val <= 0) {
+            int newSm = _eepromAfState[EEPROM_AF_STATE_STEP_MODE_MANUAL];
+            if (lastRun - btnBothPressed > HC_STEP_CHANGE_RESET_TIMEOUT_MS) {
+                newSm=1;
+                writeManualStepMode(newSm);
+                _eepromSaveAfState = true;
+                //Serial.println("MANUAL STEP MODE RESET");
+            } else if(newSm < 256) {
+                newSm*=2;
+                writeManualStepMode(newSm);
+                _eepromSaveAfState = true;
+                //Serial.print("MANUAL STEP MODE ");
+                //Serial.println(newSm);
+            }
+            stepChange = 0;
         }
     }
 }

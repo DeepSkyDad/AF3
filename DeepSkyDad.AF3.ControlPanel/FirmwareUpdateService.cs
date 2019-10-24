@@ -90,7 +90,8 @@ namespace DeepSkyDad.AF3.ControlPanel
                         return FirmwareUpdateStatus.Successful;
                     }
                 }
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _outputTextHandler(ex.Message, true);
                 _statusUpdateHandler(FirmwareUpdateStatus.Error);
@@ -98,7 +99,7 @@ namespace DeepSkyDad.AF3.ControlPanel
             }
         }
 
-        public async Task<FirmwareUpdateStatus> UpoloadFirmwareArduinoNano(string comPort, string path)
+        public async Task<FirmwareUpdateStatus> UpoloadFirmwareArduinoNano(string comPort, string path, int baudRate = 57600)
         {
             try
             {
@@ -110,13 +111,57 @@ namespace DeepSkyDad.AF3.ControlPanel
                  pyinstaller --onefile --specpath build_tmp --workpath build_tmp/build --distpath build_tmp/dist C:\Users\bramor\.platformio\packages\tool-esptoolpy\esptool.py
 
                  */
+
+                Action<string> debugDelegate = (string stdOutLine) => {
+                    _outputTextHandler(stdOutLine, false);
+                };
+                Action<string> errorDelegate = (string stdOutLine) => {
+                    _outputTextHandler(stdOutLine, true);
+                };
+
                 using (var cli = new Cli("Avrdude/avrdude.exe"))
                 {
                     // Execute
-                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b57600 -D -Uflash:w:\"{path}\":i ";
+                    var oldUploaderFailed = false;
+                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b{baudRate} -D -Uflash:w:\"{path}\":i ";
                     var handler = new BufferHandler(
-                        stdOutLine => _outputTextHandler(stdOutLine, false),
-                        stdErrLine => _outputTextHandler(stdErrLine, true)
+                        stdOutLine => {
+                            if (oldUploaderFailed)
+                                return;
+
+                            if (stdOutLine.Contains("not responding"))
+                            {
+                                if (baudRate != 115200)
+                                {
+                                    oldUploaderFailed = true;
+                                    _outputTextHandler("OLD UPLOADER FAILED, TRYING NEW UPLOADER", false);
+                                }
+
+                                cli.CancelAll();
+                            }
+                            else
+                            {
+                                _outputTextHandler(stdOutLine, false);
+                            }
+                        },
+                        stdErrLine => {
+                            if (oldUploaderFailed)
+                                return;
+
+                            if (stdErrLine.Contains("not responding"))
+                            {
+                                if (baudRate != 115200)
+                                {
+                                    _outputTextHandler("OLD UPLOADER FAILED, TRYING NEW UPLOADER", false);
+                                }
+
+                                cli.CancelAll();
+                            }
+                            else
+                            {
+                                _outputTextHandler(stdErrLine, true);
+                            }
+                        }
                     );
 
                     var output = await cli.ExecuteAsync(cmd, bufferHandler: handler);
@@ -144,10 +189,17 @@ namespace DeepSkyDad.AF3.ControlPanel
             }
             catch (Exception ex)
             {
-                _outputTextHandler(ex.Message, true);
-                _statusUpdateHandler(FirmwareUpdateStatus.Error);
-                return FirmwareUpdateStatus.Error;
+                if (baudRate != 115200)
+                {
+                    return await UpoloadFirmwareArduinoNano(comPort, path, 115200);
+                } else
+                {
+                    _outputTextHandler(ex.Message, true);
+                    _statusUpdateHandler(FirmwareUpdateStatus.Error);
+                    return FirmwareUpdateStatus.Error;
+                }
             }
         }
     }
 }
+;
