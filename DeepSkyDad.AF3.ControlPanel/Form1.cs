@@ -138,10 +138,10 @@ namespace DeepSkyDad.AF3.ControlPanel
             RefreshUI();
 
             var timer = new System.Windows.Forms.Timer();
-            timer.Interval = (500);
+            timer.Interval = (2000);
             timer.Tick += new EventHandler((object sender, EventArgs e) =>
             {
-                ReadPositionAndTemperature(false, false);
+                var result = ReadPositionAndTemperature(false, false).Result;
             });
             timer.Start();
         }
@@ -313,7 +313,6 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private async Task<bool> ReadPositionAndTemperature(bool isRefreshAbsolutePositionField = true, bool isOutputSerial = true)
         {
-            return true;
             if (!_isConnected)
                 return false;
 

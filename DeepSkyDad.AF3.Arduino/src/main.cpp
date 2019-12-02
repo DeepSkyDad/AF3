@@ -70,6 +70,7 @@ bool _eepromSaveAfState;
 
 #define MOTOR_I_14HS10_0404S_04A 240
 #define MOTOR_I_14HS17_0504S_05A 400
+#define MOTOR_I_14HS13_0804S_08A 640
 
 bool _motorIsMoving;
 bool _motorManualIsMoving;
@@ -1103,7 +1104,7 @@ void setup()
     } else if(d5 == LOW && d6 == HIGH) {
         _motorI = MOTOR_I_14HS17_0504S_05A;
     } else if(d5 == HIGH && d6 == LOW) {
-        //TODO
+        _motorI = MOTOR_I_14HS13_0804S_08A;
     } else if(d5 == LOW && d6 == LOW) {
         //TODO
     }
