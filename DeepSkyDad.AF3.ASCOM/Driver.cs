@@ -173,7 +173,7 @@ namespace ASCOM.DeepSkyDad.AF3
         public string GetInstalledFirmwareVersion()
         {
             if (Connected)
-                return CommandString("GFRL");
+                return CommandString("GFRM");
 
             serial = new Serial();
             serial.Speed = SerialSpeed.ps9600;

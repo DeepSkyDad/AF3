@@ -59,7 +59,7 @@ void TMC2130Stepper::setSPISpeed(uint32_t speed) {
 }
 
 void TMC2130Stepper::switchCSpin(bool state) {
-  digitalWrite(_pinCS, state);
+  digitalWrite(_pinCS, state ? HIGH : LOW);
 }
 
 uint32_t TMC2130Stepper::read(uint8_t addressByte) {

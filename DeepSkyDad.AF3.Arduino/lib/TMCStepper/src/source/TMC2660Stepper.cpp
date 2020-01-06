@@ -24,7 +24,7 @@ TMC2660Stepper::TMC2660Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint1
 
 void TMC2660Stepper::switchCSpin(bool state) {
   // Allows for overriding in child class to make use of fast io
-  digitalWrite(_pinCS, state);
+  digitalWrite(_pinCS, state ? HIGH : LOW);
 }
 
 uint32_t TMC2660Stepper::read() {
