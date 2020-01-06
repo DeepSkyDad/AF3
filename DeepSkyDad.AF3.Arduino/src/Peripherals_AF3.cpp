@@ -114,8 +114,7 @@ void Peripherals_AF3::handleHC()
     static long stepChange = 0;
 
     //Serial.println("Handle HC");
-
-    if (_hcConnected && !_motor->isMoving())
+    if (_hcConnected && !(_motor->isMoving() && !_motor->getMotorManualIsMovingContinuous()))
     {
         if (millis() - lastRun < 20) // don't check every loop iteration - debouncing
             return;
@@ -123,7 +122,6 @@ void Peripherals_AF3::handleHC()
         lastRun = millis();
 
         int btn_val = _readHcButton();
-
         if(stepChange == 0) {
             if (btn_val <= 0)
             {

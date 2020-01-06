@@ -155,7 +155,6 @@ bool Motor_AF3::handleMotor() {
             {
                 _stopMotor();
             }
-
             if(getMotorManualIsMovingContinuous() && _peri->readHcButton() <= 0) {
                 _peri->handleHC();
             }
