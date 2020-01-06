@@ -42,14 +42,14 @@ void Motor_AF3::_stopMotor()
 
 void Motor_AF3::_applyStepMode()
 {
-    unsigned char sm = (unsigned char)_eeprom->getStepMode();
+    unsigned short sm = _eeprom->getStepMode();
     //select microsteps (0,2,4,8,16,32,64,128,256)
     _driver.microsteps(sm == 1 ? 0 : sm); 
 }
 
 void Motor_AF3::_applyStepModeManual()
 {
-    unsigned char sm = (unsigned char)_eeprom->getStepModeManual();
+    unsigned short sm = _eeprom->getStepModeManual();
     //select microsteps (0,2,4,8,16,32,64,128,256)
     _driver.microsteps(sm == 1 ? 0 : sm); 
 }
