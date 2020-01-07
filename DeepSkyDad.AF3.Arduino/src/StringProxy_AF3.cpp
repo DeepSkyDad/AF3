@@ -201,6 +201,7 @@ char const *StringProxy_AF3::processCommand(char *command, char *commandParam, i
         Serial.println("---- PERIP ----");
         _peri->debug();
         Serial.println();
+        return RESPONSE_OK;
     }
 
     return RESPONSE_CMD_NOT_FOUND;
