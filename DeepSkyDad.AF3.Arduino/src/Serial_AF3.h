@@ -3,7 +3,7 @@
 #pragma once
 class Serial_AF3
 {
-	private:
+    private:
         StringProxy_AF3* _stringProxy;
         char _serialCommandRaw[70];
         int _serialCommandRawIdx;
@@ -11,7 +11,7 @@ class Serial_AF3
         char _command[5];
         char _commandParam[65];
         int _commandParamLength;
-	public:
-		void init(StringProxy_AF3 &stringProxy);
+    public:
+        void init(StringProxy_AF3 &stringProxy);
         void serialEvent();
 };

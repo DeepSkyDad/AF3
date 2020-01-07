@@ -32,20 +32,20 @@
 
 class StringProxy_AF3
 {
-	private:
-                EEPROM_AF3* _eeprom;
-                Motor_AF3* _motor;
-                Peripherals_AF3* _peri;
-                Test_AF3* _test;
-                char _resultBuffer1[50];
-                char _resultBuffer2[50];
-                char* _uintToChar(unsigned int value);
-                char* _floatToChar(float value);
-                bool _commandEndsWith(char c, char commandParam[], int commandParamLength);
-                char const* _formatResponse(float value);
-                char const* _formatResponse(unsigned long value);
-                char const* _formatResponse(unsigned short value);
-	public:
-		void init(EEPROM_AF3 &eeprom, Motor_AF3 &motor, Peripherals_AF3 &peri, Test_AF3 &test);
-                char const* processCommand(char *command, char *commandParam, int commandParamLength);
+    private:
+        EEPROM_AF3* _eeprom;
+        Motor_AF3* _motor;
+        Peripherals_AF3* _peri;
+        Test_AF3* _test;
+        char _resultBuffer1[50];
+        char _resultBuffer2[50];
+        char* _uintToChar(unsigned int value);
+        char* _floatToChar(float value);
+        bool _commandEndsWith(char c, char commandParam[], int commandParamLength);
+        char const* _formatResponse(float value);
+        char const* _formatResponse(unsigned long value);
+        char const* _formatResponse(unsigned short value);
+    public:
+        void init(EEPROM_AF3 &eeprom, Motor_AF3 &motor, Peripherals_AF3 &peri, Test_AF3 &test);
+        char const* processCommand(char *command, char *commandParam, int commandParamLength);
 };

@@ -11,7 +11,7 @@ bool EEPROM_AF3::_tryWriteProperty(int &address, T &property)
     if (property != propertyCurrent)
     {
         eeprom_write_block((void *)&property, (void *)address, sizeof(property));
-		_propertyWritesSinceBoot++;
+        _propertyWritesSinceBoot++;
         address += sizeof(T);
         return true;
     }

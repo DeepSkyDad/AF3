@@ -27,7 +27,7 @@ void setup()
     _motor.init(_eeprom, _peri);
     _peri.init(_eeprom, _motor);
     _stringProxy.init(_eeprom, _motor, _peri, _test);
-	_serial.init(_stringProxy);
+    _serial.init(_stringProxy);
 }
 
 void loop()

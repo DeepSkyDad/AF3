@@ -19,7 +19,7 @@
 class Peripherals_AF3; //forwared declaration
 class Motor_AF3
 {
-	private:
+    private:
                 EEPROM_AF3* _eeprom;
                 Peripherals_AF3* _peri;
                 bool _pinsInitialized = false;
@@ -39,8 +39,8 @@ class Motor_AF3
                 void _applyStepMode();
                 void _applyStepModeManual();
                 void _applyMotorCurrent();
-	public:
-		bool init(EEPROM_AF3 &eeprom, Peripherals_AF3 &peri);
+    public:
+        bool init(EEPROM_AF3 &eeprom, Peripherals_AF3 &peri);
                 bool isUartInitialized();
                 bool handleMotor();
                 void setMoveManual(bool motorManualIsMoving, bool motorManualIsMovingContinuous, bool motorManualIsMovingContinuousDir);

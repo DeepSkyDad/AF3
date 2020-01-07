@@ -31,19 +31,19 @@
 
 class Peripherals_AF3
 {
-	private:
+    private:
         EEPROM_AF3* _eeprom;
         Motor_AF3* _motor;
         OneWire _ds = OneWire(HC_PIN);
         DallasTemperature _sensors = DallasTemperature(&_ds);
-    	bool _hcConnected;
+        bool _hcConnected;
         bool _tsConnected;
         float _temperatureCelsius = -127;
         float _temperatureFahrenheit = -127;
         int _readHcPin();
         int _readHcButton();
-	public:
-		void init(EEPROM_AF3 &eeprom, Motor_AF3 &motor);
+    public:
+        void init(EEPROM_AF3 &eeprom, Motor_AF3 &motor);
         void autoDiscovery();
         void handleHC();
         void handleTS();

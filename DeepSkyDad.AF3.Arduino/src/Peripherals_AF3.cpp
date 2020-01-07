@@ -3,10 +3,10 @@
 
 void Peripherals_AF3::init(EEPROM_AF3 &eeprom, Motor_AF3 &motor)
 {
-	_eeprom = &eeprom;
-	_motor = &motor;
+    _eeprom = &eeprom;
+    _motor = &motor;
 
-	_sensors.begin();
+    _sensors.begin();
 }
 
 int Peripherals_AF3::_readHcPin() {
@@ -201,7 +201,7 @@ void Peripherals_AF3::handleHC()
             unsigned short newSm = _eeprom->getStepModeManual();
             if (lastRun - btnBothPressed > HC_STEP_CHANGE_RESET_TIMEOUT_MS) {
                 newSm=1;
-				_eeprom->setStepModeManual(newSm);
+                _eeprom->setStepModeManual(newSm);
                 _motor->applyStepModeManual();
             } else if(newSm < 256) {
                 newSm*=2;
@@ -252,18 +252,18 @@ float Peripherals_AF3::getTempCBy()
 }
 
 int Peripherals_AF3::readHcPin() {
-	return _readHcPin();
+    return _readHcPin();
 }
 
 int Peripherals_AF3::readHcButton() {
-	return _readHcButton();
+    return _readHcButton();
 }
 
 void Peripherals_AF3::debug() {
-	Serial.print("HC/TP pin voltage: ");
-	Serial.println(_readHcPin());
-	Serial.print("Temperature: ");
-	Serial.println(_temperatureCelsius);
-	Serial.print("HC connected: ");
-	Serial.println(_hcConnected);
+    Serial.print("HC/TP pin voltage: ");
+    Serial.println(_readHcPin());
+    Serial.print("Temperature: ");
+    Serial.println(_temperatureCelsius);
+    Serial.print("HC connected: ");
+    Serial.println(_hcConnected);
 }
