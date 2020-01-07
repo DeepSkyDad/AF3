@@ -203,7 +203,7 @@ void Peripherals_AF3::handleHC()
                 newSm=1;
 				_eeprom->setStepModeManual(newSm);
                 _motor->applyStepModeManual();
-            } else if(newSm <= 256) {
+            } else if(newSm < 256) {
                 newSm*=2;
                 _eeprom->setStepModeManual(newSm);
                 _motor->applyStepModeManual();
