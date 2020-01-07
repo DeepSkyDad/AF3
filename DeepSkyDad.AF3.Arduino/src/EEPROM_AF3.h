@@ -60,7 +60,7 @@ class EEPROM_AF3
 		EEPROMState _stateDefaults = {1000000, 50000, STEP_MODE::STP2, STEP_MODE::STP2, SPEED_MODE::SLOW, 0, 180000, 0, 90, 40, 500000, 500000, 0};
 		int _slidingSize = sizeof(_state.position) + sizeof(_state.targetPosition) + sizeof(_state.checksum);
 		int _configurationSize = sizeof(EEPROMState) - _slidingSize;
-		int _slidingAddressCount = EEPROM_SIZE - _configurationSize;
+		int _slidingAddressCount = EEPROM_SIZE / _configurationSize;
 		int _slidingCurrentAddress = _configurationSize;
 		bool _isConfigDirty;
 		unsigned long _lastEepromCheckMs;

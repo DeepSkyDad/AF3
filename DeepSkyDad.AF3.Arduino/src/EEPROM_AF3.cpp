@@ -167,6 +167,8 @@ void EEPROM_AF3::debug()
 {
     Serial.print("current sliding address: ");
     Serial.println(_slidingCurrentAddress);
+    Serial.print("sliding slots count: ");
+    Serial.println(_slidingAddressCount);
     Serial.print("property writes since boot: ");
     Serial.println(_propertyWritesSinceBoot);
     Serial.print("maxPosition: ");
