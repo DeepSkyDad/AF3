@@ -141,6 +141,8 @@ namespace DeepSkyDad.AF3.ControlPanel
             timer.Interval = (2000);
             timer.Tick += new EventHandler((object sender, EventArgs e) =>
             {
+                if (_isTesting)
+                    return;
                 var result = ReadPositionAndTemperature(false, false).Result;
             });
             timer.Start();
@@ -572,7 +574,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
                 while(await _serialService.SendCommand("[GMOV]") == "1")
                 {
-                    await Task.Delay(500);
+                    await Task.Delay(2000);
                 }
 
                 if(sw.Elapsed.TotalMinutes >= (double)motorTestDurationNumeric.Value)

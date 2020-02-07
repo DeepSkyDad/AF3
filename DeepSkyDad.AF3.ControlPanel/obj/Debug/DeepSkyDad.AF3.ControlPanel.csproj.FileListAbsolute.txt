@@ -12,7 +12,6 @@ D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\bin\Debug\Syroot.KnownFol
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.Form1.resources
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.Properties.Resources.resources
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.csproj.GenerateResource.cache
-D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.csproj.CoreCompileInputs.cache
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.csproj.CopyComplete
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.exe
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.pdb

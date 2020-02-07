@@ -5,8 +5,8 @@
         2. position and checksum are sliding through different addresses to prevent EEPROM wear
 */
 
-#define EEPROM_SIZE 1024 //Nano
-//#define EEPROM_SIZE 256 //Nano-Every
+//#define EEPROM_SIZE 1024 //Nano
+#define EEPROM_SIZE 256 //Nano-Every
 #define EEPROM_CHECK_PERIOD_MS 5000
 
 #pragma once

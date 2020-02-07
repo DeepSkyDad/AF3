@@ -199,7 +199,7 @@ void Peripherals_AF3::handleHC()
             }
         } else if(stepChange == 1 && btn_val <= 0) {
             unsigned short newSm = _eeprom->getStepModeManual();
-            if (lastRun - btnBothPressed > HC_STEP_CHANGE_RESET_TIMEOUT_MS) {
+            if ((lastRun - btnBothPressed) > HC_STEP_CHANGE_RESET_TIMEOUT_MS) {
                 newSm=1;
                 _eeprom->setStepModeManual(newSm);
                 _motor->applyStepModeManual();
