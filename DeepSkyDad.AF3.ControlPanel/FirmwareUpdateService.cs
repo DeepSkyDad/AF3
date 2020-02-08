@@ -105,6 +105,13 @@ namespace DeepSkyDad.AF3.ControlPanel
         {
             try
             {
+                if (Directory.Exists("tmp"))
+                    Directory.Delete("tmp", true);
+
+                Directory.CreateDirectory("tmp");
+
+                ZipFile.ExtractToDirectory(path, "tmp");
+
                 _statusUpdateHandler(FirmwareUpdateStatus.Uploading);
 
                 #region Arduino Nano - old bootloader
@@ -117,7 +124,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
                 using (Program.CurrentCli = new Cli("Avrdude/avrdude.exe"))
                 {
-                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b57600 -D -Uflash:w:\"{path}\":i ";
+                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b57600 -D -Uflash:w:\".\\tmp\\nano.hex\":i ";
                     var handler = new BufferHandler(
                         stdOutLine => {
                             if (stdOutLine.Contains("not responding"))
@@ -171,7 +178,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
                 using (Program.CurrentCli = new Cli("Avrdude/avrdude.exe"))
                 {
-                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b115200 -D -Uflash:w:\"{path}\":i ";
+                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b115200 -D -Uflash:w:\"\\tmp\\nano.hex\":i ";
                     var handler = new BufferHandler(
                         stdOutLine => {
                             if (stdOutLine.Contains("not responding"))
@@ -242,7 +249,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                 using (Program.CurrentCli = new Cli("Avrdude/avrdude.exe"))
                 {
                     // Execute
-                    var cmd = $"-CAvrdude/avrdude.conf -v -p atmega4809 -c jtag2updi -D -V -b 115200 -e -P{comPort} -Uflash:w:\"{path}\":i -Ufuse2:w:0x01:m -Ufuse5:w:0xC9:m -Ufuse8:w:0x00:m";
+                    var cmd = $"-CAvrdude/avrdude.conf -v -p atmega4809 -c jtag2updi -D -V -b 115200 -e -P{comPort} -Uflash:w:\"\\tmp\\nano_every.hex\":i -Ufuse2:w:0x01:m -Ufuse5:w:0xC9:m -Ufuse8:w:0x00:m";
                     var handler = new BufferHandler(
                         stdOutLine => {
                             if (stdOutLine.Contains("status -1"))
@@ -290,6 +297,11 @@ namespace DeepSkyDad.AF3.ControlPanel
                 _outputTextHandler(ex.Message, true);
                 _statusUpdateHandler(FirmwareUpdateStatus.Error);
                 return FirmwareUpdateStatus.Error;
+            }
+            finally
+            {
+                if (Directory.Exists("tmp"))
+                    Directory.Delete("tmp", true);
             }
 
             _statusUpdateHandler(FirmwareUpdateStatus.Error);
