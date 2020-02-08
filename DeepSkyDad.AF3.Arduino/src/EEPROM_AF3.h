@@ -45,7 +45,6 @@ class EEPROM_AF3
         unsigned long _lastEepromCheckMs;
         unsigned long _lastPositionChangeMs = 0L;
         long _propertyWritesSinceBoot = 0L;
-        int _eepromSize;
 
         unsigned long _calculateChecksum(EEPROMState state);
         void _readEeprom();
