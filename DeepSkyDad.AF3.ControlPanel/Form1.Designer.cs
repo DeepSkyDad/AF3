@@ -643,7 +643,7 @@
             // 
             this.motorTestDurationNumeric.Location = new System.Drawing.Point(85, 28);
             this.motorTestDurationNumeric.Maximum = new decimal(new int[] {
-            60,
+            600,
             0,
             0,
             0});

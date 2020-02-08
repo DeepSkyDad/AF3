@@ -15,3 +15,5 @@ D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.csproj.CopyComplete
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.exe
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.pdb
+D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\obj\Debug\DeepSkyDad.AF3.ControlPanel.csprojAssemblyReference.cache
+D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ControlPanel\bin\Debug\Avrdude\putty.exe

@@ -12,6 +12,7 @@
 #include "StringProxy_AF3.h"
 #include "Serial_AF3.h"
 #include "Test_AF3.h"
+#include "EEPROM.h"
 
 EEPROM_AF3 _eeprom;
 Motor_AF3 _motor;

@@ -80,6 +80,13 @@ namespace DeepSkyDad.AF3.ControlPanel
                 {
                     if (status == SerialServiceStatus.Connected)
                     {
+                        if(_serialService.SendCommand("[GPOS]", true, false).Result == "(ERROR)")
+                        {
+                            richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { "AF3 connection failed", true });
+                            _serialService.Disconnect();
+                            return;
+                        }
+
                         _isConnected = true;
                         btnConnect.Text = "Disconnect";
                         richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { "AF3 Connected", false });
@@ -184,7 +191,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                 return;
             }
 
-            await _firmwareUpdateService.UpoloadFirmwareArduinoNano(this.comboComPort.Text, this.textBoxFirmwareFile.Text);
+            await _firmwareUpdateService.UploadFirmwareArduinoNano(this.comboComPort.Text, this.textBoxFirmwareFile.Text);
         }
 
         private void btnExit_Click(object sender, EventArgs e)

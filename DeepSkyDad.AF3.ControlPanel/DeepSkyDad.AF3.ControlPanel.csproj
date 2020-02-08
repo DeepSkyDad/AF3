@@ -114,6 +114,9 @@
     <Content Include="Avrdude\libusb0.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Avrdude\putty.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Esptool\esptool.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

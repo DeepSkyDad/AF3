@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CliWrap;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,9 +13,14 @@ namespace DeepSkyDad.AF3.ControlPanel
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        /// 
+
+        public static Cli CurrentCli;
+
         [STAThread]
         static void Main()
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
             Form1 f = null;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true); //needed true for in memory fonts
@@ -26,6 +32,11 @@ namespace DeepSkyDad.AF3.ControlPanel
            
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             Application.Run((f = new Form1()));
+        }
+
+        static void OnProcessExit(object sender, EventArgs e)
+        {
+            CurrentCli?.CancelAll();
         }
     }
 }
