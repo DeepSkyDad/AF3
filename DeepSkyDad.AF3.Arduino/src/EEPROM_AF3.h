@@ -5,8 +5,11 @@
         2. position and checksum are sliding through different addresses to prevent EEPROM wear
 */
 
-//#define EEPROM_SIZE 1024 //Nano
-#define EEPROM_SIZE 256 //Nano-Every
+#if defined(AVR_NANO_EVERY)
+  #define EEPROM_SIZE 256
+#else
+  #define EEPROM_SIZE 1024
+#endif
 #define EEPROM_CHECK_PERIOD_MS 5000
 
 #pragma once
@@ -42,6 +45,7 @@ class EEPROM_AF3
         unsigned long _lastEepromCheckMs;
         unsigned long _lastPositionChangeMs = 0L;
         long _propertyWritesSinceBoot = 0L;
+        int _eepromSize;
 
         unsigned long _calculateChecksum(EEPROMState state);
         void _readEeprom();
