@@ -144,8 +144,6 @@ void EEPROM_AF3::debug()
     Serial.println(_slidingCurrentAddress);
     Serial.print("sliding slots count: ");
     Serial.println(_slidingAddressCount);
-    Serial.print("property writes since boot: ");
-    Serial.println(_propertyWritesSinceBoot);
     Serial.print("maxPosition: ");
     Serial.println(_state.maxPosition);
     Serial.print("maxMovement: ");

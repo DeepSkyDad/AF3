@@ -44,7 +44,6 @@ class EEPROM_AF3
         bool _isConfigDirty;
         unsigned long _lastEepromCheckMs;
         unsigned long _lastPositionChangeMs = 0L;
-        long _propertyWritesSinceBoot = 0L;
 
         unsigned long _calculateChecksum(EEPROMState state);
         void _readEeprom();
