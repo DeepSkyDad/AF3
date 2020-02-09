@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DeepSkyDad.AF3.ControlPanel
 {
@@ -153,6 +154,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                         var output = await Program.CurrentCli.ExecuteAsync(cmd, bufferHandler: handler);
                         if (output.ExitCode == 0)
                         {
+                            Program.CurrentCli = null;
                             _statusUpdateHandler(FirmwareUpdateStatus.Successful);
                             return FirmwareUpdateStatus.Successful;
                         }
@@ -178,7 +180,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
                 using (Program.CurrentCli = new Cli("Avrdude/avrdude.exe"))
                 {
-                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b115200 -D -Uflash:w:\"\\tmp\\nano.hex\":i ";
+                    var cmd = $"-CAvrdude/avrdude.conf -v -patmega328p -carduino -P{comPort} -b115200 -D -Uflash:w:\".\\tmp\\nano.hex\":i ";
                     var handler = new BufferHandler(
                         stdOutLine => {
                             if (stdOutLine.Contains("not responding"))
@@ -207,6 +209,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                         var output = await Program.CurrentCli.ExecuteAsync(cmd, bufferHandler: handler);
                         if (output.ExitCode == 0)
                         {
+                            Program.CurrentCli = null;
                             _statusUpdateHandler(FirmwareUpdateStatus.Successful);
                             return FirmwareUpdateStatus.Successful;
                         }
@@ -249,10 +252,10 @@ namespace DeepSkyDad.AF3.ControlPanel
                 using (Program.CurrentCli = new Cli("Avrdude/avrdude.exe"))
                 {
                     // Execute
-                    var cmd = $"-CAvrdude/avrdude.conf -v -p atmega4809 -c jtag2updi -D -V -b 115200 -e -P{comPort} -Uflash:w:\"\\tmp\\nano_every.hex\":i -Ufuse2:w:0x01:m -Ufuse5:w:0xC9:m -Ufuse8:w:0x00:m";
+                    var cmd = $"-CAvrdude/avrdude.conf -v -p atmega4809 -c jtag2updi -D -V -b 115200 -e -P{comPort} -Uflash:w:\".\\tmp\\nano_every.hex\":i -Ufuse2:w:0x01:m -Ufuse5:w:0xC9:m -Ufuse8:w:0x00:m";
                     var handler = new BufferHandler(
                         stdOutLine => {
-                            if (stdOutLine.Contains("status -1"))
+                            if (stdOutLine.Contains("status -1") || stdOutLine.Contains("access is denied"))
                             {
                                 Program.CurrentCli.CancelAll();
                             }
@@ -277,8 +280,13 @@ namespace DeepSkyDad.AF3.ControlPanel
                     try
                     {
                         var output = await Program.CurrentCli.ExecuteAsync(cmd, bufferHandler: handler);
-                        _statusUpdateHandler(FirmwareUpdateStatus.Successful);
-                        return FirmwareUpdateStatus.Successful;
+                        if (output.ExitCode == 0)
+                        {
+                            MessageBox.Show("Please reconnect AF3 power in order to finish the upgrade", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            Program.CurrentCli = null;
+                            _statusUpdateHandler(FirmwareUpdateStatus.Successful);
+                            return FirmwareUpdateStatus.Successful;
+                        }
                     }
                     catch (Exception e)
                     {

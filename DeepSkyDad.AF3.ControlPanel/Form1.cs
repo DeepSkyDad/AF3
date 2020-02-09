@@ -34,7 +34,6 @@ namespace DeepSkyDad.AF3.ControlPanel
         private SerialService _serialService;
         private FirmwareUpdateService _firmwareUpdateService;
 
-        private bool _isConnected;
         private bool _isUploadingFirmware;
         private bool _isTesting;
 
@@ -70,8 +69,8 @@ namespace DeepSkyDad.AF3.ControlPanel
 
             this.labelTitle.Font = new Font(_fonts.Families[0], 12, FontStyle.Bold);
             this.labelTitle.Left = (this.ClientSize.Width - this.labelTitle.Width) / 2;
-            this.labelTitle.Top = 20;
-            this.labelTitle.Text = "DSD AF3 Control Panel v1.0.0";
+            this.labelTitle.Top = 16;
+            this.labelTitle.Text = $"DSD AF3 Control Panel v{Application.ProductVersion}";
 
             this.comboComPort.DropDown += comPortCombo_DropDown;
 
@@ -87,7 +86,6 @@ namespace DeepSkyDad.AF3.ControlPanel
                             return;
                         }
 
-                        _isConnected = true;
                         btnConnect.Text = "Disconnect";
                         richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { "AF3 Connected", false });
                         RefreshUI();
@@ -95,7 +93,6 @@ namespace DeepSkyDad.AF3.ControlPanel
                     }
                     else
                     {
-                        _isConnected = false;
                         btnConnect.Text = "Connect";
                         richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { "AF3 Disconnected", false });
                         RefreshUI();
@@ -221,23 +218,39 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private void RefreshUI()
         {
-            comboComPort.Enabled = !_isConnected && !_isUploadingFirmware;
+            comboComPort.Enabled = !_serialService.isConnected() && !_isUploadingFirmware;
             btnExit.Enabled = !_isUploadingFirmware;
 
-            btnChooseFirmware.Enabled = !_isUploadingFirmware && !_isConnected;
-            textBoxFirmwareFile.Enabled = !_isUploadingFirmware && !_isConnected;
-            btnUpload.Enabled = !_isUploadingFirmware && !_isConnected;
-
-            motorTestStepsNumeric.Enabled = _isConnected && !_isTesting;
-            motorTestDurationNumeric.Enabled = _isConnected && !_isTesting;
-            motorTestStartBtn.Enabled = _isConnected && !_isTesting;
-            motorTestStopBtn.Enabled = _isConnected && _isTesting;
-
-            foreach (Control c in groupBoxManualControl.Controls)
+            foreach (Control c in tabControl.Controls)
             {
                 if (c.GetType() == typeof(Label))
                     continue;
-                c.Enabled = _isConnected && !_isTesting;
+                c.Enabled = _serialService.isConnected() && !_isTesting;
+            }
+
+            foreach (Control c in tabSettings.Controls)
+            {
+                if (c.GetType() == typeof(Label))
+                    continue;
+                c.Enabled = _serialService.isConnected() && !_isTesting;
+            }
+
+            foreach (Control c in tabFwUpgrade.Controls)
+            {
+                if (c.GetType() == typeof(Label))
+                    continue;
+                c.Enabled = !_isUploadingFirmware && !_serialService.isConnected();
+            }
+
+            btnStop.Enabled = _serialService.isConnected();
+        }
+
+        private async void ChangeMaxMoveIfNeccessary(int steps)
+        {
+            if (steps > numericMaxMove.Value && steps <= numericMaxMove.Maximum)
+            {
+                numericMaxMove.Value = steps;
+                await _serialService.SendCommand($"[SMXM{steps}]");
             }
         }
 
@@ -316,17 +329,22 @@ namespace DeepSkyDad.AF3.ControlPanel
             }
             comboBoxSpeedMode.Text = speedMode;
 
+            numericMaximumPosition.Value = Convert.ToInt32(await _serialService.SendCommand("[GMXP]"));
+            numericMaxMove.Value = Convert.ToInt32(await _serialService.SendCommand("[GMXM]"));
             currentMoveMultiplierNumeric.Value = Convert.ToInt32(await _serialService.SendCommand("[GMMM]"));
             currentHoldMultiplierNumeric.Value = Convert.ToInt32(await _serialService.SendCommand("[GMHM]"));
         }
 
         private async Task<bool> ReadPositionAndTemperature(bool isRefreshAbsolutePositionField = true, bool isOutputSerial = true)
         {
-            if (!_isConnected)
+            if (!_serialService.isConnected())
                 return false;
 
             var position = await _serialService.SendCommand("[GPOS]", true, isOutputSerial);
             var tmpC = await _serialService.SendCommand("[GTMC]", true, isOutputSerial);
+
+            if (!_serialService.isConnected())
+                return false;
 
             labelPosition.Text = position;
             if(isRefreshAbsolutePositionField)
@@ -377,6 +395,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private async void MoveForSteps(int steps)
         {
+            ChangeMaxMoveIfNeccessary(steps);
             var pos = Convert.ToInt32(await _serialService.SendCommand("[GPOS]"));
             var target = pos + steps;
 
@@ -416,7 +435,7 @@ namespace DeepSkyDad.AF3.ControlPanel
 
             try
             {
-                if (_isConnected)
+                if (_serialService.isConnected())
                 {
                     _serialService.Disconnect();
                     ClearUI();
@@ -432,73 +451,6 @@ namespace DeepSkyDad.AF3.ControlPanel
             }
 
             RefreshUI();
-        }
-
-        private async void comboBoxStepMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string stepMode;
-            switch (comboBoxStepMode.Text)
-            {
-                case "1":
-                    stepMode = "0";
-                    break;
-                case "1/2":
-                    stepMode = "2";
-                    break;
-                case "1/4":
-                    stepMode = "4";
-                    break;
-                case "1/8":
-                    stepMode = "8";
-                    break;
-                case "1/16":
-                    stepMode = "16";
-                    break;
-                case "1/32":
-                    stepMode = "32";
-                    break;
-                case "1/64":
-                    stepMode = "64";
-                    break;
-                case "1/128":
-                    stepMode = "128";
-                    break;
-                case "1/256":
-                    stepMode = "256";
-                    break;
-                default:
-                    throw new Exception("Invalid step size: " + comboBoxStepMode.Text);
-            }
-
-            await _serialService.SendCommand($"[SSTP{stepMode}]");
-        }
-
-        private async void comboBoxSpeedMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string speedMode;
-            switch (comboBoxSpeedMode.Text)
-            {
-                case "Very slow":
-                    speedMode = "1";
-                    break;
-                case "Slow":
-                    speedMode = "2";
-                    break;
-                case "Medium":
-                    speedMode = "3";
-                    break;
-                case "Fast":
-                    speedMode = "4";
-                    break;
-                case "Very fast":
-                    speedMode = "5";
-                    break;
-                default:
-                    speedMode = "1";
-                    break;
-            }
-
-            await _serialService.SendCommand($"[SSPD{speedMode}]");
         }
 
         private void btnPlus90_Click(object sender, EventArgs e)
@@ -537,44 +489,32 @@ namespace DeepSkyDad.AF3.ControlPanel
 
         private async void btnMoveAbsoluteGo_Click(object sender, EventArgs e)
         {
+            ChangeMaxMoveIfNeccessary(Math.Abs(Convert.ToInt32(labelPosition.Text) - (int)numericMoveAbsoluteSteps.Value));
             await _serialService.SendCommand($"[STRG{(int)numericMoveAbsoluteSteps.Value}]");
             await _serialService.SendCommand("[SMOV]");
         }
 
         private async void btnStop_Click(object sender, EventArgs e)
         {
+            _isTesting = false;
             await _serialService.SendCommand("[STOP]");
-        }
-        
-        private async void checkBoxReverseDirection_CheckedChanged(object sender, EventArgs e)
-        {
-            await _serialService.SendCommand($"[SREV{(checkBoxReverseDirection.Checked == true ? 1 : 0)}]");
-        }
-
-        private async void currentMoveMultiplierNumeric_ValueChanged(object sender, EventArgs e)
-        {
-            await _serialService.SendCommand($"[SMMM{currentMoveMultiplierNumeric.Value}]");
-        }
-
-        private async void currentHoldMultiplierNumeric_ValueChanged(object sender, EventArgs e)
-        {
-            await _serialService.SendCommand($"[SMHM{currentHoldMultiplierNumeric.Value}]");
+            RefreshUI();
         }
 
         private async void motorTestStartBtn_Click(object sender, EventArgs e)
         {
+            var moveSteps = (int)motorTestStepsNumeric.Value;
+            ChangeMaxMoveIfNeccessary(moveSteps);
             _isTesting = true;
             RefreshUI();
-            var pos = Convert.ToInt32(await _serialService.SendCommand("[GPOS]")) + motorTestStepsNumeric.Value;
-            var factor = 1;
+            var pos = Convert.ToInt32(await _serialService.SendCommand("[GPOS]")) + moveSteps;
+            var factor = -1;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
             while (_isTesting)
-            {
-                var target = pos + motorTestStepsNumeric.Value * factor;
-                factor *= -1;
-                var result = await _serialService.SendCommand($"[STRG{target}]");
+            { 
+                var result = await _serialService.SendCommand($"[STRG{pos}]");
                 if (result == "101")
                     break;
                 await _serialService.SendCommand("[SMOV]");
@@ -584,11 +524,15 @@ namespace DeepSkyDad.AF3.ControlPanel
                     await Task.Delay(2000);
                 }
 
-                if(sw.Elapsed.TotalMinutes >= (double)motorTestDurationNumeric.Value)
+                if(!_serialService.isConnected() || sw.Elapsed.TotalMinutes >= (double)motorTestDurationNumeric.Value)
                 {
                     _isTesting = false;
                     RefreshUI();
                 }
+
+                pos = pos + (moveSteps * factor);
+                factor *= -1;
+                await Task.Delay(1000);
             }
         }
 
@@ -596,6 +540,93 @@ namespace DeepSkyDad.AF3.ControlPanel
         {
             _isTesting = false;
             RefreshUI();
+        }
+
+        private void label9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPlus360_Click(object sender, EventArgs e)
+        {
+            var stepMode = comboBoxStepMode.Text;
+            MoveForAngle(360, stepMode);
+        }
+
+        private void btnMinus360_Click(object sender, EventArgs e)
+        {
+            var stepMode = comboBoxStepMode.Text;
+            MoveForAngle(-360, stepMode);
+        }
+
+        private async void button2_Click_1(object sender, EventArgs e)
+        {
+            string stepMode;
+            switch (comboBoxStepMode.Text)
+            {
+                case "1":
+                    stepMode = "0";
+                    break;
+                case "1/2":
+                    stepMode = "2";
+                    break;
+                case "1/4":
+                    stepMode = "4";
+                    break;
+                case "1/8":
+                    stepMode = "8";
+                    break;
+                case "1/16":
+                    stepMode = "16";
+                    break;
+                case "1/32":
+                    stepMode = "32";
+                    break;
+                case "1/64":
+                    stepMode = "64";
+                    break;
+                case "1/128":
+                    stepMode = "128";
+                    break;
+                case "1/256":
+                    stepMode = "256";
+                    break;
+                default:
+                    throw new Exception("Invalid step size: " + comboBoxStepMode.Text);
+            }
+
+            await _serialService.SendCommand($"[SSTP{stepMode}]");
+
+            string speedMode;
+            switch (comboBoxSpeedMode.Text)
+            {
+                case "Very slow":
+                    speedMode = "1";
+                    break;
+                case "Slow":
+                    speedMode = "2";
+                    break;
+                case "Medium":
+                    speedMode = "3";
+                    break;
+                case "Fast":
+                    speedMode = "4";
+                    break;
+                case "Very fast":
+                    speedMode = "5";
+                    break;
+                default:
+                    speedMode = "1";
+                    break;
+            }
+
+            await _serialService.SendCommand($"[SSPD{speedMode}]");
+            await _serialService.SendCommand($"[SSPD{speedMode}]");
+            await _serialService.SendCommand($"[SMXP{numericMaximumPosition.Value}]");
+            await _serialService.SendCommand($"[SMXM{numericMaxMove.Value}]");
+            await _serialService.SendCommand($"[SREV{(checkBoxReverseDirection.Checked == true ? 1 : 0)}]");
+            await _serialService.SendCommand($"[SMMM{currentMoveMultiplierNumeric.Value}]");
+            await _serialService.SendCommand($"[SMHM{currentHoldMultiplierNumeric.Value}]");
         }
     }
 

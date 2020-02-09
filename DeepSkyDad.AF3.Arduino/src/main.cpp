@@ -23,6 +23,9 @@ Test_AF3 _test;
 
 void setup()
 {
+    while (!Serial) {
+        ; // wait for serial port to connect. Needed for native USB port only
+    }
     Serial.begin(115200);
     _eeprom.init();
     _motor.init(_eeprom, _peri);

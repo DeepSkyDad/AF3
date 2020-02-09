@@ -33,6 +33,11 @@ namespace DeepSkyDad.AF3.ControlPanel
             _isCallOutputTextHandler = true;
         }
 
+        public bool isConnected()
+        {
+            return _portIsConnected;
+        }
+
         public async void Connect(string comPort)
         {
             try
@@ -140,6 +145,12 @@ namespace DeepSkyDad.AF3.ControlPanel
             {
                 if (_isCallOutputTextHandler)
                     _outputTextHandler($"Command execution failed: {ex.Message}", true);
+                if (ex.Message.Contains("The port is closed"))
+                {
+                    _portIsConnected = false;
+                    _statusUpdateHandler(SerialServiceStatus.Disconnected);
+                }
+
                 return "(ERROR)";
             }
          
