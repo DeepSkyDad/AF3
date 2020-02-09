@@ -5,7 +5,7 @@
         2. position and checksum are sliding through different addresses to prevent EEPROM wear
 */
 
-#if defined(AVR_NANO_EVERY)
+#if defined(ARDUINO_AVR_NANO_EVERY)
   #define EEPROM_SIZE 256
 #else
   #define EEPROM_SIZE 1024

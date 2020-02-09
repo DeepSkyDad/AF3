@@ -140,6 +140,8 @@ void EEPROM_AF3::resetToDefaults()
 
 void EEPROM_AF3::debug()
 {
+    Serial.print("EEPROM size: ");
+    Serial.println(EEPROM_SIZE);
     Serial.print("current sliding address: ");
     Serial.println(_slidingCurrentAddress);
     Serial.print("sliding slots count: ");
