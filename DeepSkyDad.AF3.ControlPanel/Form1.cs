@@ -100,7 +100,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                 },
                 (string serialDataReceived, bool isError) =>
                 {
-                    richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { serialDataReceived, isError });
+                    richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { $"{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}: {serialDataReceived}", isError });
                 }
             );
 

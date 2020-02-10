@@ -25,6 +25,7 @@ void setup()
 {
     while (!Serial) {
         ; // wait for serial port to connect. Needed for native USB port only
+        //NOTE: https://github.com/arduino/ArduinoCore-megaavr/issues/51
     }
     Serial.begin(115200);
     _eeprom.init();
@@ -41,7 +42,7 @@ void loop()
             _serial.serialEvent();
             delay(500);
             return;
-        }
+        } 
     }
 
     _motor.handleMotor();
