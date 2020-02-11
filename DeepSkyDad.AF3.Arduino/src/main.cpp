@@ -3,6 +3,7 @@
 
         version 1.0.0 - 13.09.2019: clone of AF1
         version 1.0.1 - 04.01.2020: refactoring, nano-every compatibility, EEPROM optimizations
+        version 1.0.2 - 11.02.2020: refactoring, nano-every compatibility & eeprom fix
 */
 
 #include <Arduino.h>
@@ -25,7 +26,7 @@ void setup()
 {
     while (!Serial) {
         ; // wait for serial port to connect. Needed for native USB port only
-        //NOTE: https://github.com/arduino/ArduinoCore-megaavr/issues/51
+        //Nano Every NOTE: https://github.com/arduino/ArduinoCore-megaavr/issues/51
     }
     Serial.begin(115200);
     _eeprom.init();
