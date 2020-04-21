@@ -624,7 +624,7 @@
             this.btnMinus360.Name = "btnMinus360";
             this.btnMinus360.Size = new System.Drawing.Size(126, 23);
             this.btnMinus360.TabIndex = 144;
-            this.btnMinus360.Text = "+360  deg";
+            this.btnMinus360.Text = "-360  deg";
             this.btnMinus360.UseVisualStyleBackColor = true;
             this.btnMinus360.Click += new System.EventHandler(this.btnMinus360_Click);
             // 
