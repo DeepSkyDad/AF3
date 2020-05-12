@@ -87,7 +87,7 @@ namespace DeepSkyDad.AF3.ControlPanel
                         }
 
                         btnConnect.Text = "Disconnect";
-                        richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { "AF3 Connected", false });
+                        richTextboxOutput.Invoke(new AppendOutputTextDelegate(AppendOutputText), new Object[] { $"AF3 Connected ({FirmwareUpdateService.GetArduinoType(comboComPort.Text).ToString()})", false });
                         RefreshUI();
                         ReadFocuserState();
                     }
