@@ -16,17 +16,14 @@
 #if (__cplusplus == 201703L) && defined(__has_include)
 	#define SW_CAPABLE_PLATFORM __has_include(<SoftwareSerial.h>)
 #else
-	#define SW_CAPABLE_PLATFORM defined(__AVR__) || defined(TARGET_LPC1768) || defined(ARDUINO_ARCH_STM32F1)
+	#define SW_CAPABLE_PLATFORM defined(__AVR__) || defined(TARGET_LPC1768) || defined(ARDUINO_ARCH_STM32)
 #endif
 
 #if SW_CAPABLE_PLATFORM
 	#include <SoftwareSerial.h>
 #endif
 
-#ifdef TMC_SERIAL_SWITCH
-	#include "source/SERIAL_SWITCH.h"
-#endif
-
+#include "source/SERIAL_SWITCH.h"
 #include "source/SW_SPI.h"
 
 #pragma GCC diagnostic pop
@@ -49,7 +46,7 @@
 #define INIT2224_REGISTER(REG) TMC2224_n::REG##_t REG##_register = TMC2224_n::REG##_t
 #define SET_ALIAS(TYPE, DRIVER, NEW, ARG, OLD) TYPE (DRIVER::*NEW)(ARG) = &DRIVER::OLD
 
-#define TMCSTEPPER_VERSION 0x000501 // v0.5.1
+#define TMCSTEPPER_VERSION 0x000602 // v0.6.2
 
 class TMCStepper {
 	public:
@@ -118,9 +115,8 @@ class TMCStepper {
 
 		struct TSTEP_t { constexpr static uint8_t address = 0x12; };
 		struct MSCNT_t { constexpr static uint8_t address = 0x6A; };
-
-		virtual void write(uint8_t, uint32_t) = 0;
 		virtual uint32_t read(uint8_t) = 0;
+		virtual void write(uint8_t, uint32_t) = 0;
 		virtual void vsense(bool) = 0;
 		virtual bool vsense(void) = 0;
 		virtual uint32_t DRV_STATUS() = 0;
@@ -353,7 +349,7 @@ class TMC2130Stepper : public TMCStepper {
 
 		static uint32_t spi_speed; // Default 2MHz
 		const uint16_t _pinCS;
-		SW_SPIClass * TMC_SW_SPI = NULL;
+		SW_SPIClass * TMC_SW_SPI = nullptr;
 		static constexpr float default_RS = 0.11;
 
 		int8_t link_index;
@@ -616,8 +612,8 @@ class TMC5130Stepper : public TMC2160Stepper {
 		int32_t X_ENC();
 		void X_ENC(int32_t input);
 		// W: ENC_CONST
-		uint16_t ENC_CONST();
-		void ENC_CONST(uint16_t input);
+		uint32_t ENC_CONST();
+		void ENC_CONST(uint32_t input);
 		// R: ENC_STATUS
 		bool ENC_STATUS();
 		// R: ENC_LATCH
@@ -661,8 +657,6 @@ class TMC5130Stepper : public TMC2160Stepper {
 		struct X_ENC_t 		{ constexpr static uint8_t address = 0x39; }; // RW
 		struct ENC_STATUS_t { constexpr static uint8_t address = 0x3B; }; // R+C
 		struct ENC_LATCH_t 	{ constexpr static uint8_t address = 0x3C; }; // R
-		struct MSCNT_t		{ constexpr static uint8_t address = 0x6A; }; // R
-		struct MSCURACT_t 	{ constexpr static uint8_t address = 0x6B; }; // R
 
 		/*
 		INIT_REGISTER(MSLUT0){0};
@@ -810,22 +804,27 @@ class TMC5161Stepper : public TMC5160Stepper {
 
 class TMC2208Stepper : public TMCStepper {
 	public:
-	  #ifdef TMC_SERIAL_SWITCH
 	    TMC2208Stepper(Stream * SerialPort, float RS, uint8_t addr, uint16_t mul_pin1, uint16_t mul_pin2);
-	  #endif
-		TMC2208Stepper(Stream * SerialPort, float RS, bool) :
+		TMC2208Stepper(Stream * SerialPort, float RS) :
 			TMC2208Stepper(SerialPort, RS, TMC2208_SLAVE_ADDR)
 			{}
 		#if SW_CAPABLE_PLATFORM
-			TMC2208Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, bool has_rx=true) :
-				TMC2208Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2208_SLAVE_ADDR, has_rx)
+			TMC2208Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS) :
+				TMC2208Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2208_SLAVE_ADDR)
 				{}
+			TMC2208Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, bool) :
+				TMC2208Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2208_SLAVE_ADDR)
+				{}
+		#else
+			TMC2208Stepper(uint16_t, uint16_t, float) = delete; // Your platform does not currently support Software Serial
 		#endif
 		void defaults();
 		void push();
 		void begin();
 		#if SW_CAPABLE_PLATFORM
-		void beginSerial(uint32_t baudrate);
+			void beginSerial(uint32_t baudrate);
+		#else
+			void beginSerial(uint32_t) = delete; // Your platform does not currently support Software Serial
 		#endif
 		bool isEnabled();
 
@@ -962,8 +961,6 @@ class TMC2208Stepper : public TMCStepper {
 		uint8_t pwm_ofs_auto();
 		uint8_t pwm_grad_auto();
 
-		bool isWriteOnly() {return write_only;}
-
 		uint16_t bytesWritten = 0;
 		float Rsense = 0.11;
 		bool CRCerror = false;
@@ -981,17 +978,16 @@ class TMC2208Stepper : public TMCStepper {
 
 		TMC2208Stepper(Stream * SerialPort, float RS, uint8_t addr);
 		#if SW_CAPABLE_PLATFORM
-			TMC2208Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, uint8_t addr, bool has_rx);
+			TMC2208Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, uint8_t addr);
 		#endif
 
-		Stream * HWSerial = NULL;
+		Stream * HWSerial = nullptr;
 		#if SW_CAPABLE_PLATFORM
-			SoftwareSerial * SWSerial = NULL;
+			SoftwareSerial * SWSerial = nullptr;
+			const uint16_t RXTX_pin = 0; // Half duplex
 		#endif
 
-		#ifdef TMC_SERIAL_SWITCH
-      	    SSwitch *sswitch = NULL;
-    	#endif
+		SSwitch *sswitch = nullptr;
 
 		void write(uint8_t, uint32_t);
 		uint32_t read(uint8_t);
@@ -999,13 +995,12 @@ class TMC2208Stepper : public TMCStepper {
 		uint8_t calcCRC(uint8_t datagram[], uint8_t len);
 		static constexpr uint8_t  TMC2208_SYNC = 0x05,
 															TMC2208_SLAVE_ADDR = 0x00;
-		const bool write_only;
 		static constexpr uint8_t replyDelay = 2;
 		static constexpr uint8_t abort_window = 5;
 		static constexpr uint8_t max_retries = 2;
 
 		template<typename SERIAL_TYPE>
-		friend uint64_t _sendDatagram(SERIAL_TYPE &, uint8_t [], const uint8_t, uint16_t);
+		uint64_t _sendDatagram(SERIAL_TYPE &, uint8_t [], const uint8_t, uint16_t);
 };
 
 class TMC2209Stepper : public TMC2208Stepper {
@@ -1015,7 +1010,9 @@ class TMC2209Stepper : public TMC2208Stepper {
 
 		#if SW_CAPABLE_PLATFORM
 			TMC2209Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, uint8_t addr) :
-				TMC2208Stepper(SW_RX_pin, SW_TX_pin, RS, addr, SW_RX_pin != SW_TX_pin) {}
+				TMC2208Stepper(SW_RX_pin, SW_TX_pin, RS, addr) {}
+		#else
+			TMC2209Stepper(uint16_t, uint16_t, float, uint8_t) = delete; // Your platform does not currently support Software Serial
 		#endif
 		void push();
 
@@ -1235,5 +1232,5 @@ class TMC2660Stepper {
 		float holdMultiplier = 0.5;
 		uint32_t spi_speed = 16000000/8; // Default 2MHz
 		uint8_t _savedToff = 0;
-		SW_SPIClass * TMC_SW_SPI = NULL;
+		SW_SPIClass * TMC_SW_SPI = nullptr;
 };

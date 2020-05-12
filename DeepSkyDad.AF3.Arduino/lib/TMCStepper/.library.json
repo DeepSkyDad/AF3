@@ -6,6 +6,7 @@
     }, 
     "platforms": [
         "atmelavr", 
+        "atmelmegaavr", 
         "atmelsam", 
         "espressif32", 
         "espressif8266", 
@@ -24,7 +25,7 @@
     "frameworks": [
         "arduino"
     ], 
-    "version": "0.5.1", 
+    "version": "0.6.2", 
     "authors": [
         {
             "maintainer": false, 

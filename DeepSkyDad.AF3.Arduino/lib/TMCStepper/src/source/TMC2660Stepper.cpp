@@ -30,7 +30,7 @@ void TMC2660Stepper::switchCSpin(bool state) {
 uint32_t TMC2660Stepper::read() {
   uint32_t response = 0UL;
   uint32_t dummy = ((uint32_t)DRVCONF_register.address<<17) | DRVCONF_register.sr;
-  if (TMC_SW_SPI != NULL) {
+  if (TMC_SW_SPI != nullptr) {
     switchCSpin(LOW);
     response |= TMC_SW_SPI->transfer((dummy >> 16) & 0xFF);
     response <<= 8;
@@ -53,7 +53,7 @@ uint32_t TMC2660Stepper::read() {
 
 void TMC2660Stepper::write(uint8_t addressByte, uint32_t config) {
   uint32_t data = (uint32_t)addressByte<<17 | config;
-  if (TMC_SW_SPI != NULL) {
+  if (TMC_SW_SPI != nullptr) {
     switchCSpin(LOW);
     TMC_SW_SPI->transfer((data >> 16) & 0xFF);
     TMC_SW_SPI->transfer((data >>  8) & 0xFF);
@@ -123,6 +123,10 @@ void TMC2660Stepper::rms_current(uint16_t mA) {
   } else { // If CS >= 16, turn off high_sense_r
     vsense(false);
   }
+
+  if (CS > 31)
+    CS = 31;
+
   cs(CS);
   //val_mA = mA;
 }

@@ -22,6 +22,8 @@ StringProxy_AF3 _stringProxy;
 Serial_AF3 _serial;
 Test_AF3 _test;
 
+int pm = 0;
+
 void setup()
 {
     while (!Serial) {
@@ -34,16 +36,21 @@ void setup()
     _peri.init(_eeprom, _motor);
     _stringProxy.init(_eeprom, _motor, _peri, _test);
     _serial.init(_stringProxy);
+    pinMode(LED_BUILTIN, OUTPUT);
+
 }
 
 void loop()
 { 
     if(!_motor.isUartInitialized()) {
         if(!_motor.init(_eeprom, _peri)) {
+            digitalWrite(LED_BUILTIN, (pm++%2) == 0 ? HIGH : LOW);
             _serial.serialEvent();
             delay(500);
             return;
-        } 
+        } else {
+            digitalWrite(LED_BUILTIN, LOW);
+        }
     }
 
     _motor.handleMotor();

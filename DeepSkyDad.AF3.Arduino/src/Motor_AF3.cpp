@@ -79,7 +79,7 @@ bool Motor_AF3::init(EEPROM_AF3 &eeprom, Peripherals_AF3 &peri)
 {
     _eeprom = &eeprom;
     _peri = &peri;
-
+    
     if(!_pinsInitialized) {
         pinMode(TMC220X_PIN_DIR, OUTPUT);
         pinMode(TMC220X_PIN_STEP, OUTPUT);
@@ -98,9 +98,21 @@ bool Motor_AF3::init(EEPROM_AF3 &eeprom, Peripherals_AF3 &peri)
 
     _driver.begin();
 
-    if (_driver.test_connection() != 0) {
-        return false;
+    /****** IMPORTANT - TMCStepper 0.6.2 lib overrides ********
+
+    1. baudRate of SoftwareSerial for TMC2208 was reduced to 57600 due to Nano Every CRC issues on test_connection (DRV_STATUS) call (TMCS2208Stepper.cpp, beginSerial(57200)) 
+    2. TMC2130Stepper::switchCSpin and TMC2660Stepper::switchCSpin digital write changed from digitalWrite(_pinCS, !state); to digitalWrite(_pinCS, state ? HIGH : LOW); because of AVR specifics (cant use boolean)
+    
+    ****** IMPORTANT - TMCStepper 0.6.2 lib overrides ********/
+    int testConnection;
+    for(int i=0; i<5; i++) {
+        testConnection = _driver.test_connection();
+        if(testConnection == 0)
+            break;
     }
+    
+    if(testConnection != 0)
+        return false;
 
     _driver.pdn_disable(true); //enable UART
     _applyMotorCurrent();
@@ -112,6 +124,7 @@ bool Motor_AF3::init(EEPROM_AF3 &eeprom, Peripherals_AF3 &peri)
     _driver.intpol(true); //use interpolation
     _driver.TPOWERDOWN(255); //time until current reduction after the motor stops. Use maximum (5.6s)
     digitalWrite(TMC220X_PIN_ENABLE, LOW); //enable coils
+
     _uartInitialized = true;
     return true;
 }
@@ -121,6 +134,13 @@ bool Motor_AF3::isUartInitialized() {
 }
 
 bool Motor_AF3::handleMotor() {
+    /*_driver.DRV_STATUS();
+    if(_driver.CRCerror) {
+         Serial.print(millis());
+         Serial.println("ms: CRC ERROR");
+    }
+    delay(10);*/
+
     if (_motorIsMoving) {
         //give priority to motor with dedicated 50ms loops (effectivly pausing main loop, including serial event processing)
         while (millis() - _debouncingLastRunMs < 50)
@@ -250,6 +270,10 @@ bool Motor_AF3::isMovingWithSettle() {
 void Motor_AF3::debug() {
     Serial.print("Motor full current (mA): ");
     Serial.println(_motorI);
+    Serial.print("TMC DRV_STATUS: ");
+    Serial.println(_driver.DRV_STATUS());
+    Serial.print("TMC CRC error: ");
+    Serial.println(_driver.CRCerror);
 }
 
 void Motor_AF3::legacyTest() {

@@ -15,7 +15,7 @@ void TMC2160Stepper::begin() {
   pinMode(_pinCS, OUTPUT);
   switchCSpin(HIGH);
 
-  if (TMC_SW_SPI != NULL) TMC_SW_SPI->init();
+  if (TMC_SW_SPI != nullptr) TMC_SW_SPI->init();
 
   GCONF(GCONF_register.sr);
   CHOPCONF(CHOPCONF_register.sr);
@@ -28,7 +28,6 @@ void TMC2160Stepper::begin() {
 }
 
 void TMC2160Stepper::defaults() {
-  PWMCONF_register.sr = 0x00050480;
   SHORT_CONF_register.s2vs_level = 6;
   SHORT_CONF_register.s2g_level = 6;
   SHORT_CONF_register.shortfilter = 0b01;
@@ -84,6 +83,10 @@ void TMC2160Stepper::rms_current(uint16_t mA) {
     if (scaler > 255) scaler = 0; // Maximum
     else if (scaler < 128) CS--;  // Try again with smaller CS
   } while(0 < scaler && scaler < 128);
+
+
+  if (CS > 31)
+    CS = 31;
 
   GLOBAL_SCALER(scaler);
   irun(CS);
