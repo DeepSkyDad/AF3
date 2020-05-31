@@ -169,15 +169,6 @@ namespace DeepSkyDad.AF3.ControlPanel
 
                 switch(GetArduinoType(comPort))
                 {
-                    case ArduinoType.CH340:
-                    case ArduinoType.FTDI:
-                        if (await UploadFirmwareArduinoNanoOldBootloader(comPort) == FirmwareUpdateStatus.Successful)
-                            return FirmwareUpdateStatus.Successful;
-                        if (await UploadFirmwareArduinoNanoNewBootloader(comPort) == FirmwareUpdateStatus.Successful)
-                            return FirmwareUpdateStatus.Successful;
-                        if (await UploadFirmwareArduinoNanoEvery(comPort) == FirmwareUpdateStatus.Successful)
-                            return FirmwareUpdateStatus.Successful;
-                        break;
                     case ArduinoType.EVERY:
                         if (await UploadFirmwareArduinoNanoEvery(comPort) == FirmwareUpdateStatus.Successful)
                             return FirmwareUpdateStatus.Successful;
@@ -186,8 +177,16 @@ namespace DeepSkyDad.AF3.ControlPanel
                         if (await UploadFirmwareArduinoNanoNewBootloader(comPort) == FirmwareUpdateStatus.Successful)
                             return FirmwareUpdateStatus.Successful;
                         break;
+                    case ArduinoType.CH340:
+                    case ArduinoType.FTDI:
                     default:
-                        throw new Exception("Unknown board");
+                        if (await UploadFirmwareArduinoNanoOldBootloader(comPort) == FirmwareUpdateStatus.Successful)
+                            return FirmwareUpdateStatus.Successful;
+                        if (await UploadFirmwareArduinoNanoNewBootloader(comPort) == FirmwareUpdateStatus.Successful)
+                            return FirmwareUpdateStatus.Successful;
+                        if (await UploadFirmwareArduinoNanoEvery(comPort) == FirmwareUpdateStatus.Successful)
+                            return FirmwareUpdateStatus.Successful;
+                        break;
                 }
                
             }
