@@ -99,7 +99,7 @@
         <member name="F:ASCOM.SettingsProvider.ascomProfile">
             <summary>
               A reference to an ASCOM profile provider. Normally, this will be the default implementation defined in
-              <see cref="T:ASCOM.Utilities.Profile"/>, but unit tests can also use dependency injection to provide
+              <see cref = "T:ASCOM.Utilities.Profile" />, but unit tests can also use dependency injection to provide
               a mock provider. This value will be initialized (once) in the constructor.
             </summary>
         </member>
@@ -110,26 +110,42 @@
         </member>
         <member name="M:ASCOM.SettingsProvider.#ctor">
             <summary>
-              Initializes a new instance of the <see cref="T:ASCOM.SettingsProvider"/> class with the default
-              profile provider <see cref="T:ASCOM.Utilities.Profile"/>.
+              Initializes a new instance of the <see cref = "T:ASCOM.SettingsProvider" /> class with the default
+              profile provider <see cref = "T:ASCOM.Utilities.Profile" />.
             </summary>
         </member>
         <member name="M:ASCOM.SettingsProvider.#ctor(ASCOM.Utilities.Interfaces.IProfile)">
             <summary>
-              Initializes a new instance of the <see cref="T:ASCOM.SettingsProvider"/> class with the supplied
+              Initializes a new instance of the <see cref = "T:ASCOM.SettingsProvider" /> class with the supplied
               Profile Provider. This is useful for injecting a mock profile object during unit testing.
             </summary>
-            <param name="profileProvider">The <see cref="T:ASCOM.Utilities.Interfaces.IProfile"/> to be used.</param>
+            <param name = "profileProvider">The <see cref = "T:ASCOM.Utilities.Interfaces.IProfile" /> to be used.</param>
+        </member>
+        <member name="P:ASCOM.SettingsProvider.Name">
+            <summary>
+              Returns the provider's friendly name used during configuration.
+            </summary>
+        </member>
+        <member name="P:ASCOM.SettingsProvider.Description">
+            <summary>
+              Gets the provider's friendly description.
+            </summary>
+        </member>
+        <member name="P:ASCOM.SettingsProvider.ApplicationName">
+            <summary>
+              Gets the name of the driver or application for which settings are being managed.
+              This value is set during provider initialization and cannot be changed thereafter.
+            </summary>
         </member>
         <member name="M:ASCOM.SettingsProvider.Initialize(System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
               Initializes the ASCOM Settings Provider.
             </summary>
-            <param name="name">Ignored.</param>
-            <param name="config">Not used.</param>
+            <param name = "name">Ignored.</param>
+            <param name = "config">Not used.</param>
             <remarks>
-              This method is called by <see cref="T:System.Configuration.ApplicationSettingsBase"/> to initialize the settings provider.
-              Normally, this will set the provider's <see cref="P:ASCOM.SettingsProvider.ApplicationName"/> property to the assembly name
+              This method is called by <see cref = "T:System.Configuration.ApplicationSettingsBase" /> to initialize the settings provider.
+              Normally, this will set the provider's <see cref = "P:ASCOM.SettingsProvider.ApplicationName" /> property to the assembly name
               of the application. This is later used to determine the storage location of each of the settings.
               However, for ASCOM purposes, we can't use the application name and we need to key off the
               ASCOM DeviceID of the driver, so in ASCOM.SettingsProvider, the application name is set but never used.
@@ -139,11 +155,11 @@
             <summary>
               Retrieves a collection of settings values from the underlying ASCOM Profile store.
             </summary>
-            <param name="context">Not used.</param>
-            <param name="collection">The list of properties to be retrieved.</param>
+            <param name = "context">Not used.</param>
+            <param name = "collection">The list of properties to be retrieved.</param>
             <returns>
               Returns a collection of the retrieved property values as a
-              <see cref="T:System.Configuration.SettingsPropertyValueCollection"/>.
+              <see cref = "T:System.Configuration.SettingsPropertyValueCollection" />.
             </returns>
             <remarks>
               If any properties are absent in the underlying store, or if an error occurs while
@@ -162,27 +178,11 @@
             <summary>
               Checks whether the driver is registered with ASCOM and, if not, registers it.
             </summary>
-            <param name="ascomProfile">
-              A reference to a <see cref="T:ASCOM.Utilities.Profile"/> object
+            <param name = "ascomProfile">
+              A reference to a <see cref = "T:ASCOM.Utilities.Profile" /> object
               that is used to query the ASCOM Device Profile.
             </param>
-            <param name="driverId">The full ASCOM DeviceID to be verified.</param>
-        </member>
-        <member name="P:ASCOM.SettingsProvider.Name">
-            <summary>
-              Returns the provider's friendly name used during configuration.
-            </summary>
-        </member>
-        <member name="P:ASCOM.SettingsProvider.Description">
-            <summary>
-              Gets the provider's friendly description.
-            </summary>
-        </member>
-        <member name="P:ASCOM.SettingsProvider.ApplicationName">
-            <summary>
-              Gets the name of the driver or application for which settings are being managed.
-              This value is set during provider initialization and cannot be changed thereafter.
-            </summary>
+            <param name = "driverId">The full ASCOM DeviceID to be verified.</param>
         </member>
     </members>
 </doc>

@@ -118,6 +118,7 @@ namespace ASCOM.DeepSkyDad.AF3
                 {
                     tls.LogMessage("Request", command);
                     serial.ClearBuffers();
+                    Thread.Sleep(50);
                     serial.Transmit(command);
                     response = serial.ReceiveTerminated(")"); //wait until termination character
 

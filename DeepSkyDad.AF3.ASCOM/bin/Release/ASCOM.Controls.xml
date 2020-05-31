@@ -34,12 +34,12 @@
               </para>
               <para>
                 The Anunciator control provides a simple, standard method of displaying a status notification to the user within a Windows Forms application.
-                Anunciators are best used with the companion <see cref="T:ASCOM.Controls.AnnunciatorPanel"/> control, although they can be placed anywhere on a Windows Form.
+                Anunciators are best used with the companion <see cref = "T:ASCOM.Controls.AnnunciatorPanel" /> control, although they can be placed anywhere on a Windows Form.
                 The control can be used to provide simple On/Off status displays or can be configured to blink with various levels of urgency so that it can
                 represent alarm conditions.
                 <example>
                   An anunciator may represent the slewing state of a telescope. It would be represented by the word "SLEW". When the telescope is stationary,
-                  the anunciator remains inactive. When the telescope begins to slew, the anunciator is set to <see cref="F:ASCOM.Controls.CadencePattern.BlinkFast"/> 
+                  the anunciator remains inactive. When the telescope begins to slew, the anunciator is set to <see cref = "F:ASCOM.Controls.CadencePattern.BlinkFast" /> 
                   to alert the user that the equipment is in motion.
                 </example>
               </para>
@@ -50,39 +50,12 @@
                 is promoted accross different applications.
               </para>
               <para>
-                Whilst the user is at liberty to choose different colours for both <see cref="P:ASCOM.Controls.Annunciator.ActiveColor"/> and <see cref="P:ASCOM.Controls.Annunciator.InactiveColor"/>, 
+                Whilst the user is at liberty to choose different colours for both <see cref = "P:ASCOM.Controls.Annunciator.ActiveColor" /> and <see cref = "P:ASCOM.Controls.Annunciator.InactiveColor" />, 
                 The default colours have been chosen to look similar to earlier applications that use similar displays and the defaults are highly 
                 recommended for most circumstances. The control's background colour is inherited from the parent control (which should normally be 
-                an <see cref="T:ASCOM.Controls.AnnunciatorPanel"/>) and is not directly settable by the user.
+                an <see cref = "T:ASCOM.Controls.AnnunciatorPanel" />) and is not directly settable by the user.
               </para>
             </summary>
-        </member>
-        <member name="T:ASCOM.Controls.ICadencedControl">
-            <summary>
-              Defines the members necessary for a control to register and be managed by the
-              <see cref="T:ASCOM.Controls.CadenceManager"/> singleton.
-            </summary>
-        </member>
-        <member name="M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)">
-            <summary>
-              Updates the control's display.
-              <see cref="T:ASCOM.Controls.CadenceManager"/> always calls this method on the GUI thread so that control updates are thread-safe.
-            </summary>
-            <param name="newState">
-              The new display state of the control: <c>true</c> for active, <c>false</c> for inactive.
-            </param>
-        </member>
-        <member name="P:ASCOM.Controls.ICadencedControl.Cadence">
-            <summary>
-              Gets or sets the cadence (blink pattern) of the control.
-              Different cadence patterns imply different levels of urgency or severity.
-            </summary>
-            <value>The cadence pattern.</value>
-            <remarks>
-              <see cref="T:ASCOM.Controls.CadencePattern"/> is based on a 64-bit long integer but
-              only 32-bits are used. This is necessary to achieve CLS compliance, because
-              32-bit uints are not CLS compliant.
-            </remarks>
         </member>
         <member name="F:ASCOM.Controls.Annunciator.lastState">
             <summary>
@@ -101,47 +74,8 @@
         </member>
         <member name="M:ASCOM.Controls.Annunciator.#ctor">
             <summary>
-              Initializes a new instance of the <see cref="T:ASCOM.Controls.Annunciator"/> class.
+              Initializes a new instance of the <see cref = "T:ASCOM.Controls.Annunciator" /> class.
             </summary>
-        </member>
-        <member name="M:ASCOM.Controls.Annunciator.StopCadenceUpdates">
-            <summary>
-              Unregisters this control from the <see cref="T:ASCOM.Controls.CadenceManager"/> so that it will no longer receive cadence updates.
-            </summary>
-        </member>
-        <member name="M:ASCOM.Controls.Annunciator.StartCadenceUpdates">
-            <summary>
-              Registers this control with the <see cref="T:ASCOM.Controls.CadenceManager"/> so that it will receive cadence updates.
-            </summary>
-        </member>
-        <member name="M:ASCOM.Controls.Annunciator.Dispose">
-            <summary>
-            Releases all resources used by the <see cref="T:System.ComponentModel.Component"/>.
-            </summary>
-        </member>
-        <member name="M:ASCOM.Controls.Annunciator.Dispose(System.Boolean)">
-            <summary>
-            Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Label"/> and optionally releases the managed resources.
-            </summary>
-            <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-        </member>
-        <member name="M:ASCOM.Controls.Annunciator.CadenceUpdate(System.Boolean)">
-            <summary>
-              Updates the anunciator's display, if it has changed since the last update.
-            </summary>
-            <param name="newState">The new state of the control's appearance ('on' or 'off').</param>
-            <remarks>
-            Implements the <see cref="M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)"/> method.
-            The <see cref="T:ASCOM.Controls.CadenceManager"/> always calls this method on the GUI thread.
-            </remarks>
-        </member>
-        <member name="M:ASCOM.Controls.Annunciator.AnnunciatorParentChanged(System.Object,System.EventArgs)">
-            <summary>
-              Handles the ParentChanged event of the Anunciator control.
-              Changes the control's background colour to blend in with the parent control.
-            </summary>
-            <param name="sender">The source of the event.</param>
-            <param name="e">The <see cref="T:System.EventArgs"/> instance containing the event data.</param>
         </member>
         <member name="P:ASCOM.Controls.Annunciator.ForeColor">
             <summary>
@@ -190,7 +124,7 @@
             <summary>
               Gets or sets a value indicating whether the control can respond to user interaction.
               For an anunciator, this affects how it displays. A disabled anunciator will always display in
-              its <see cref="P:ASCOM.Controls.Annunciator.InactiveColor"/> regardless of other settings and it will not participate in
+              its <see cref = "P:ASCOM.Controls.Annunciator.InactiveColor" /> regardless of other settings and it will not participate in
               cadence updates.
             </summary>
             <value></value>
@@ -198,11 +132,32 @@
               The default is <c>true</c>.
             </returns>
             <PermissionSet>
-              <IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/>
-              <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/>
-              <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode, ControlEvidence"/>
-              <IPermission class="System.Diagnostics.PerformanceCounterPermission, System, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/>
+              <IPermission class = "System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version = "1" Unrestricted = "true" />
+              <IPermission class = "System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version = "1" Unrestricted = "true" />
+              <IPermission class = "System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version = "1" Flags = "UnmanagedCode, ControlEvidence" />
+              <IPermission class = "System.Diagnostics.PerformanceCounterPermission, System, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version = "1" Unrestricted = "true" />
             </PermissionSet>
+        </member>
+        <member name="M:ASCOM.Controls.Annunciator.StopCadenceUpdates">
+            <summary>
+              Unregisters this control from the <see cref="T:ASCOM.Controls.CadenceManager"/> so that it will no longer receive cadence updates.
+            </summary>
+        </member>
+        <member name="M:ASCOM.Controls.Annunciator.StartCadenceUpdates">
+            <summary>
+              Registers this control with the <see cref="T:ASCOM.Controls.CadenceManager"/> so that it will receive cadence updates.
+            </summary>
+        </member>
+        <member name="M:ASCOM.Controls.Annunciator.Dispose">
+            <summary>
+            Releases all resources used by the <see cref="T:System.ComponentModel.Component"/>.
+            </summary>
+        </member>
+        <member name="M:ASCOM.Controls.Annunciator.Dispose(System.Boolean)">
+            <summary>
+            Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Label"/> and optionally releases the managed resources.
+            </summary>
+            <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         </member>
         <member name="P:ASCOM.Controls.Annunciator.Cadence">
             <summary>
@@ -211,6 +166,24 @@
             </summary>
             <value>The cadence pattern.</value>
         </member>
+        <member name="M:ASCOM.Controls.Annunciator.CadenceUpdate(System.Boolean)">
+            <summary>
+              Updates the anunciator's display, if it has changed since the last update.
+            </summary>
+            <param name="newState">The new state of the control's appearance ('on' or 'off').</param>
+            <remarks>
+            Implements the <see cref="M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)"/> method.
+            The <see cref="T:ASCOM.Controls.CadenceManager"/> always calls this method on the GUI thread.
+            </remarks>
+        </member>
+        <member name="M:ASCOM.Controls.Annunciator.AnnunciatorParentChanged(System.Object,System.EventArgs)">
+            <summary>
+              Handles the ParentChanged event of the Anunciator control.
+              Changes the control's background colour to blend in with the parent control.
+            </summary>
+            <param name = "sender">The source of the event.</param>
+            <param name = "e">The <see cref = "T:System.EventArgs" /> instance containing the event data.</param>
+        </member>
         <member name="T:ASCOM.Controls.Annunciator.CadenceUpdateDelegate">
             <summary>
               Defines the signature for the CadenceUpdateDelegate, used in making thread-safe control updates.
@@ -218,14 +191,14 @@
         </member>
         <member name="T:ASCOM.Controls.AnnunciatorPanel">
             <summary>
-              A panel control for grouping and arranging <see cref="T:ASCOM.Controls.Annunciator"/> controls.
-              This control inherits most of its behaviour from the <see cref="T:System.Windows.Forms.FlowLayoutPanel"/>
+              A panel control for grouping and arranging <see cref = "T:ASCOM.Controls.Annunciator" /> controls.
+              This control inherits most of its behaviour from the <see cref = "T:System.Windows.Forms.FlowLayoutPanel" />
               base class, but provides some defaults that are appropriate for use with ASCOM.
             </summary>
         </member>
         <member name="M:ASCOM.Controls.AnnunciatorPanel.#ctor">
             <summary>
-              Initializes a new instance of the <see cref="T:ASCOM.Controls.AnnunciatorPanel"/> class.
+              Initializes a new instance of the <see cref = "T:ASCOM.Controls.AnnunciatorPanel" /> class.
             </summary>
         </member>
         <member name="M:ASCOM.Controls.AnnunciatorPanel.Dispose">
@@ -237,13 +210,13 @@
             <summary>
               Manages objects that must be toggled on and off in a regular pattern over time. This is known as a cadence.
               CadenceManager is intended primarily for Windows Forms controls, but can be used for any item that implements
-              the <see cref="T:ASCOM.Controls.ICadencedControl"/> interface.
+              the <see cref = "T:ASCOM.Controls.ICadencedControl" /> interface.
             </summary>
             <remarks>
               CadenceManager behaves slightly differently if the managed item is a Windows Forms control.
-              <list type="bulleted">
+              <list type = "bulleted">
                 <item>Invisible controls do not receive updates until they become visible again.</item>
-                <item>The <see cref="M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)"/> method is marshalled to the GUI thread.</item>
+                <item>The <see cref = "M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)" /> method is marshalled to the GUI thread.</item>
               </list>
             </remarks>
         </member>
@@ -281,12 +254,20 @@
             except by the class itself - this is how the singleton pattern ensures there is just a single instance.
             </summary>
         </member>
+        <member name="P:ASCOM.Controls.CadenceManager.Instance">
+            <summary>
+              Gets a reference to the Singleton.
+              If the Singleton has not yet be instantiated, this causes the object
+              to be created and the constructor to execute (lazy loading).
+              This operation uses the double-checked locking pattern to ensure thread-safety.
+            </summary>
+        </member>
         <member name="M:ASCOM.Controls.CadenceManager.Add(ASCOM.Controls.ICadencedControl)">
             <summary>
-              Adds the specified <see cref="T:ASCOM.Controls.ICadencedControl"/> to the list of managed controls.
+              Adds the specified <see cref = "T:ASCOM.Controls.ICadencedControl" /> to the list of managed controls.
               If this is the first control being added, then the update timer is configured and started.
             </summary>
-            <param name="control">The control to be managed.</param>
+            <param name = "control">The control to be managed.</param>
             <remarks>
               Each control can only appear in the list once (duplicate adds will be silently ignored).
             </remarks>
@@ -307,19 +288,11 @@
         <member name="M:ASCOM.Controls.CadenceManager.TmrCadenceTick(System.Object,System.Timers.ElapsedEventArgs)">
             <summary>
               Handles the Tick event of the tmrCadence control.
-              Computes the new display status for each cadenced control based on its <see cref="P:ASCOM.Controls.ICadencedControl.Cadence"/>
+              Computes the new display status for each cadenced control based on its <see cref = "P:ASCOM.Controls.ICadencedControl.Cadence" />
               property and requests the control update itself with the new value.
             </summary>
-            <param name="sender">The source of the event.</param>
-            <param name="e">The <see cref="T:System.EventArgs"/> instance containing the event data.</param>
-        </member>
-        <member name="P:ASCOM.Controls.CadenceManager.Instance">
-            <summary>
-              Gets a reference to the Singleton.
-              If the Singleton has not yet be instantiated, this causes the object
-              to be created and the constructor to execute (lazy loading).
-              This operation uses the double-checked locking pattern to ensure thread-safety.
-            </summary>
+            <param name = "sender">The source of the event.</param>
+            <param name = "e">The <see cref = "T:System.EventArgs" /> instance containing the event data.</param>
         </member>
         <member name="T:ASCOM.Controls.CadenceManager.CadenceUpdateDelegate">
             <summary>
@@ -378,6 +351,33 @@
             appropriate for indicating non-critical ongoing steady active state.
             </summary>
         </member>
+        <member name="T:ASCOM.Controls.ICadencedControl">
+            <summary>
+              Defines the members necessary for a control to register and be managed by the
+              <see cref = "T:ASCOM.Controls.CadenceManager" /> singleton.
+            </summary>
+        </member>
+        <member name="P:ASCOM.Controls.ICadencedControl.Cadence">
+            <summary>
+              Gets or sets the cadence (blink pattern) of the control.
+              Different cadence patterns imply different levels of urgency or severity.
+            </summary>
+            <value>The cadence pattern.</value>
+            <remarks>
+              <see cref = "T:ASCOM.Controls.CadencePattern" /> is based on a 64-bit long integer but
+              only 32-bits are used. This is necessary to achieve CLS compliance, because
+              32-bit uints are not CLS compliant.
+            </remarks>
+        </member>
+        <member name="M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)">
+            <summary>
+              Updates the control's display.
+              <see cref = "T:ASCOM.Controls.CadenceManager" /> always calls this method on the GUI thread so that control updates are thread-safe.
+            </summary>
+            <param name="newState">
+              The new display state of the control: <c>true</c> for active, <c>false</c> for inactive.
+            </param>
+        </member>
         <member name="T:ASCOM.Controls.LedIndicator">
             <summary>
               Provides a status indicator modeled on a bi-colour red/green LED lamp.
@@ -417,6 +417,32 @@
               Internal panel control that is used to display the LED's colour.
             </summary>
         </member>
+        <member name="P:ASCOM.Controls.LedIndicator.Status">
+            <summary>
+              Gets or sets the LED's status (which controls its display colour).
+            </summary>
+        </member>
+        <member name="P:ASCOM.Controls.LedIndicator.LabelText">
+            <summary>
+              Sets the text displayed alongside the indicator
+            </summary>
+        </member>
+        <member name="P:ASCOM.Controls.LedIndicator.Enabled">
+            <summary>
+              Sets or reads the 'power status' of the LED
+              When the LED is Enabled, it reflects the current colour settings and cadence.
+              When disabled, the LED appears off and cadencing is disabled.
+            </summary>
+        </member>
+        <member name="P:ASCOM.Controls.LedIndicator.Cadence">
+            <summary>
+              Gets or sets the LED cadence bitmap.
+              If the cadence has changed and is non-steady and the LED is enabled, then the cadence timer is started.
+            </summary>
+            <remarks>
+              Implements the <see cref = "P:ASCOM.Controls.ICadencedControl.Cadence" /> property.
+            </remarks>
+        </member>
         <member name="M:ASCOM.Controls.LedIndicator.#ctor">
             <summary>
               Default constructor for a new LEDIndicator object. Performs the default processing required
@@ -445,10 +471,10 @@
               Refreshes the LED display, taking account of the power,
               colour and cadence settings.
             </summary>
-            <param name="newstate">The new state of the control's appearance ('on' or 'off').</param>
+            <param name = "newstate">The new state of the control's appearance ('on' or 'off').</param>
             <remarks>
-              Implements the <see cref="M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)"/> method.
-              The <see cref="T:ASCOM.Controls.CadenceManager"/> always calls this method on the GUI thread.
+              Implements the <see cref = "M:ASCOM.Controls.ICadencedControl.CadenceUpdate(System.Boolean)" /> method.
+              The <see cref = "T:ASCOM.Controls.CadenceManager" /> always calls this method on the GUI thread.
             </remarks>
         </member>
         <member name="M:ASCOM.Controls.LedIndicator.RenderOffAppearance">
@@ -470,39 +496,13 @@
         </member>
         <member name="M:ASCOM.Controls.LedIndicator.StopCadenceUpdates">
             <summary>
-              Unregister from the <see cref="T:ASCOM.Controls.CadenceManager"/>.
+              Unregister from the <see cref = "T:ASCOM.Controls.CadenceManager" />.
             </summary>
         </member>
         <member name="M:ASCOM.Controls.LedIndicator.StartCadenceUpdates">
             <summary>
-              Register with the <see cref="T:ASCOM.Controls.CadenceManager"/>.
+              Register with the <see cref = "T:ASCOM.Controls.CadenceManager" />.
             </summary>
-        </member>
-        <member name="P:ASCOM.Controls.LedIndicator.Status">
-            <summary>
-              Gets or sets the LED's status (which controls its display colour).
-            </summary>
-        </member>
-        <member name="P:ASCOM.Controls.LedIndicator.LabelText">
-            <summary>
-              Sets the text displayed alongside the indicator
-            </summary>
-        </member>
-        <member name="P:ASCOM.Controls.LedIndicator.Enabled">
-            <summary>
-              Sets or reads the 'power status' of the LED
-              When the LED is Enabled, it reflects the current colour settings and cadence.
-              When disabled, the LED appears off and cadencing is disabled.
-            </summary>
-        </member>
-        <member name="P:ASCOM.Controls.LedIndicator.Cadence">
-            <summary>
-              Gets or sets the LED cadence bitmap.
-              If the cadence has changed and is non-steady and the LED is enabled, then the cadence timer is started.
-            </summary>
-            <remarks>
-              Implements the <see cref="P:ASCOM.Controls.ICadencedControl.Cadence"/> property.
-            </remarks>
         </member>
         <member name="P:ASCOM.Controls.Properties.Settings.ASCOMStandardsURL">
             <summary>

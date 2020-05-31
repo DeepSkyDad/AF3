@@ -82,19 +82,19 @@
             <summary>
               Returns the specified number of characters from the head of a string.
             </summary>
-            <param name="source">The source string.</param>
-            <param name="length">The number of characters to be returned, must not be greater than the length of the string.</param>
+            <param name = "source">The source string.</param>
+            <param name = "length">The number of characters to be returned, must not be greater than the length of the string.</param>
             <returns>The specified number of characters from the head of the source string, as a new string.</returns>
-            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the requested number of characters exceeds the string length.</exception>
+            <exception cref = "T:System.ArgumentOutOfRangeException">Thrown if the requested number of characters exceeds the string length.</exception>
         </member>
         <member name="M:ASCOM.Internal.StringExtensions.Tail(System.String,System.Int32)">
             <summary>
               Returns the specified number of characters from the tail of a string.
             </summary>
-            <param name="source">The source string.</param>
-            <param name="length">The number of characters to be returned, must not be greater than the length of the string.</param>
+            <param name = "source">The source string.</param>
+            <param name = "length">The number of characters to be returned, must not be greater than the length of the string.</param>
             <returns>The specified number of characters from the tail of the source string, as a new string.</returns>
-            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the requested number of characters exceeds the string length.</exception>
+            <exception cref = "T:System.ArgumentOutOfRangeException">Thrown if the requested number of characters exceeds the string length.</exception>
         </member>
         <member name="M:ASCOM.Internal.StringExtensions.Clean(System.String,System.String)">
             <summary>

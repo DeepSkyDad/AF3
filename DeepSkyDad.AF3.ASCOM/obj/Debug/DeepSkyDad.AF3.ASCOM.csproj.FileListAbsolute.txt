@@ -1,6 +1,7 @@
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.DeepSkyDad.AF3.Focuser.dll.config
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.DeepSkyDad.AF3.Focuser.dll
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.DeepSkyDad.AF3.Focuser.pdb
+D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.DeepSkyDad.AF3.Focuser.tlb
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.Astrometry.dll
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.Attributes.dll
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.Controls.dll
@@ -18,11 +19,10 @@ D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.Exceptions.xml
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.SettingsProvider.xml
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.Utilities.xml
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Debug\ASCOM.Internal.Extensions.xml
-D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\DeepSkyDad.AF3.ASCOM.csprojAssemblyReference.cache
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\ASCOM.DeepSkyDad.AF3.Properties.Resources.resources
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\ASCOM.DeepSkyDad.AF3.SetupDialogForm.resources
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\DeepSkyDad.AF3.ASCOM.csproj.GenerateResource.cache
-D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\DeepSkyDad.AF3.ASCOM.csproj.CoreCompileInputs.cache
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\DeepSkyDad.AF3.ASCOM.csproj.CopyComplete
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\ASCOM.DeepSkyDad.AF3.Focuser.dll
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\ASCOM.DeepSkyDad.AF3.Focuser.pdb
+D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Debug\DeepSkyDad.AF3.ASCOM.csprojAssemblyReference.cache

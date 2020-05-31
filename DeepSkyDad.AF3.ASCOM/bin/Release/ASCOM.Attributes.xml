@@ -42,9 +42,9 @@
         </member>
         <member name="M:ASCOM.DeviceIdAttribute.#ctor(System.String)">
             <summary>
-              Initializes a new instance of the <see cref="T:ASCOM.DeviceIdAttribute"/> class.
+              Initializes a new instance of the <see cref = "T:ASCOM.DeviceIdAttribute" /> class.
             </summary>
-            <param name="deviceId">The ASCOM device ID (aka COM ProgID) to be associated with the class.</param>
+            <param name = "deviceId">The ASCOM device ID (aka COM ProgID) to be associated with the class.</param>
             <remarks>
               <para>
                 Recommended usage is:
@@ -79,9 +79,9 @@
         </member>
         <member name="M:ASCOM.ServedClassNameAttribute.#ctor(System.String)">
             <summary>
-              Initializes a new instance of the <see cref="T:ASCOM.ServedClassNameAttribute"/> class.
+              Initializes a new instance of the <see cref = "T:ASCOM.ServedClassNameAttribute" /> class.
             </summary>
-            <param name="servedClassName">The 'friendly name' of the served class.</param>
+            <param name = "servedClassName">The 'friendly name' of the served class.</param>
         </member>
         <member name="P:ASCOM.ServedClassNameAttribute.DisplayName">
             <summary>
