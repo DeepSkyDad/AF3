@@ -5,3 +5,9 @@ Could you follow the guide at https://www.arduino.cc/en/Guide/NANOEvery (Firmwar
 ./bossac --port=$portname -U true -i -e -w -v MuxTO.bin -R
 update_muxto.zip
 Thanks a lot
+
+Check if values are updated (when flashing):
+M_MCU hardware version: 1
+M_MCU firmware version: 1.07
+S_MCU hardware version: 1
+S_MCU firmware version: 6.07

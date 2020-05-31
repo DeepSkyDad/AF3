@@ -26,8 +26,11 @@ int pm = 0;
 
 void setup()
 {
+    pinMode(LED_BUILTIN, OUTPUT);
     while (!Serial) {
-        ; // wait for serial port to connect. Needed for native USB port only
+        digitalWrite(LED_BUILTIN, (pm++%2) == 0 ? HIGH : LOW);
+        delay(10);
+        // wait for serial port to connect. Needed for native USB port only
         //Nano Every NOTE: https://github.com/arduino/ArduinoCore-megaavr/issues/51
     }
     Serial.begin(115200);
@@ -36,8 +39,6 @@ void setup()
     _peri.init(_eeprom, _motor);
     _stringProxy.init(_eeprom, _motor, _peri, _test);
     _serial.init(_stringProxy);
-    pinMode(LED_BUILTIN, OUTPUT);
-
 }
 
 void loop()
