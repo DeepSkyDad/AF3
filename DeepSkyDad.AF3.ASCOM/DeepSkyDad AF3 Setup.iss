@@ -9,20 +9,20 @@
 ;4. Enter command "signtool.exe sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p" 
 ;SignTool=MsSign $f
 AppID={{13d23dd8-c0a2-495f-a9a2-b2573c231e0e}
-AppName=ASCOM DSD AF3 v1.0.1
-AppVerName=ASCOM DSD AF3 v1.0.1
-AppVersion=1.0.1
+AppName=ASCOM DSD AF3 v1.0.2
+AppVerName=ASCOM DSD AF3 v1.0.2
+AppVersion=1.0.2
 AppPublisher=Pavle Gartner <pavle.gartner@gmail.com>
 AppPublisherURL=mailto:pavle.gartner@gmail.com
 AppSupportURL=http://tech.groups.yahoo.com/group/ASCOM-Talk/
 AppUpdatesURL=http://ascom-standards.org/
-VersionInfoVersion=1.0.1
+VersionInfoVersion=1.0.2
 MinVersion=0,5.0.2195sp4
 DefaultDirName="{cf}\ASCOM\Focuser"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir="."
-OutputBaseFilename="ASCOM DSD AF3 Setup v1.0.1"
+OutputBaseFilename="ASCOM DSD AF3 Setup v1.0.2"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
@@ -62,9 +62,6 @@ Filename: "{dotnet4032}\regasm.exe"; Parameters: "-u ""{app}\ASCOM.DeepSkyDad.AF
 ; This helps to give a clean uninstall
 Filename: "{dotnet4064}\regasm.exe"; Parameters: "/codebase ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
 Filename: "{dotnet4064}\regasm.exe"; Parameters: "-u ""{app}\ASCOM.DeepSkyDad.AF3\ASCOM.DeepSkyDad.AF3.Focuser.dll"""; Flags: runhidden 64bit; Check: IsWin64
-
-
-
 
 [CODE]
 //
@@ -107,8 +104,8 @@ var
 begin
   if (CurStep = ssInstall) then // Install step has started
 	begin
-      // Create the correct registry location name, which is based on the AppId
-      UninstallRegistry := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}' + '_is1');
+      // Create the correct registry location name, which is based on the AppID
+      UninstallRegistry := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppID")}' + '_is1');
       // Check whether an extry exists
       if RegQueryStringValue(HKLM, UninstallRegistry, 'UninstallString', UninstallExe) then
         begin // Entry exists and previous version is installed so run its uninstaller quietly after informing the user

@@ -9,10 +9,9 @@ using System.Threading;
 
 namespace ASCOM.DeepSkyDad.AF3
 {
-    public partial class Focuser
+    public partial class FocuserTemplate
     {
         //private const long commandTimeoutMs = 130;
-        private Version minimumFirmwareVerson = new Version("5.60");
 
         //for locking serial communication
         private Mutex serialMutex = null;

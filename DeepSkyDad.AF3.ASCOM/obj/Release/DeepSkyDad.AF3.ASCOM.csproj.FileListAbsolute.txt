@@ -1,5 +1,5 @@
-D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF3.Focuser.dll.config
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF3.Focuser.dll
+D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF3.Focuser.dll.config
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF3.Focuser.pdb
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.DeepSkyDad.AF3.Focuser.tlb
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\bin\Release\ASCOM.Astrometry.dll
@@ -25,3 +25,4 @@ D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Release\DeepSkyDad.AF3.ASCOM
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Release\DeepSkyDad.AF3.ASCOM.csproj.CopyComplete
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Release\ASCOM.DeepSkyDad.AF3.Focuser.dll
 D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Release\ASCOM.DeepSkyDad.AF3.Focuser.pdb
+D:\Projects\DeepSkyDad.AF3\DeepSkyDad.AF3.ASCOM\obj\Release\DeepSkyDad.AF3.ASCOM.csprojAssemblyReference.cache

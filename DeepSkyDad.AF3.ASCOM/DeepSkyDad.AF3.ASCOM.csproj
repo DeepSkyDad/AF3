@@ -97,7 +97,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Driver.cs" />
+    <Compile Include="Focuser2.cs" />
+    <Compile Include="Focuser1.cs" />
+    <Compile Include="DriverTemplate.cs" />
     <Compile Include="DriverExtension.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
