@@ -424,11 +424,11 @@ namespace ASCOM.DeepSkyDad.AF3
                     }
                     else if (speedMode == "Slow")
                     {
-                        spd = 1;
+                        spd = 2;
                     }
                     else if (speedMode == "Medium")
                     {
-                        spd = 2;
+                        spd = 3;
                     }
                     else if (speedMode == "Fast")
                     {

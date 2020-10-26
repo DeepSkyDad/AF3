@@ -111,6 +111,7 @@ namespace ASCOM.DeepSkyDad.AF3
                     tl.LogMessage("CommandString async", string.Format("Sending command {0}", command));
                     tls.LogMessage("Request async", command);
                     serial.ClearBuffers();
+                    Thread.Sleep(50);
                     serial.Transmit(command); //async message - do not wait for response
                 }
                 else
