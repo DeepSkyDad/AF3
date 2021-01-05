@@ -42,6 +42,9 @@ class Peripherals_AF3
         float _temperatureFahrenheit = -127;
         int _readHcPin();
         int _readHcButton();
+        unsigned long lastRun = 0;
+        float tempC;
+        float tempF;
     public:
         void init(EEPROM_AF3 &eeprom, Motor_AF3 &motor);
         void autoDiscovery();

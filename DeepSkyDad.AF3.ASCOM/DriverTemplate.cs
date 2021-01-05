@@ -613,8 +613,8 @@ namespace ASCOM.DeepSkyDad.AF3
             }
             set
             {
-                if (value && Temperature == -127)
-                    throw new NotConnectedException("Temperature sensor not connected");
+                //if (value && Temperature == -127)
+                //    throw new NotConnectedException("Temperature sensor not connected");
                 temperatureCompensation = value;
             }
         }
@@ -635,8 +635,8 @@ namespace ASCOM.DeepSkyDad.AF3
             get
             {
                 var temp = Convert.ToDouble(CommandString($"GTMC"), new CultureInfo("en") { NumberFormat = { NumberDecimalSeparator = "." } });
-                if (temp == -127)
-                    throw new NotConnectedException("Temperature sensor not connected");
+                //if (temp == -127)
+                //    throw new NotConnectedException("Temperature sensor not connected");
 
                 return temp;
             }

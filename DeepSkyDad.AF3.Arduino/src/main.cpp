@@ -33,7 +33,7 @@ void setup()
         // wait for serial port to connect. Needed for native USB port only
         //Nano Every NOTE: https://github.com/arduino/ArduinoCore-megaavr/issues/51
     }
-    Serial.begin(57600);
+    Serial.begin(115200);
     _eeprom.init();
     _motor.init(_eeprom, _peri);
     _peri.init(_eeprom, _motor);

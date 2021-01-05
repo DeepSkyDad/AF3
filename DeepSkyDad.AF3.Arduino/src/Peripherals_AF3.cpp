@@ -85,7 +85,7 @@ void Peripherals_AF3::autoDiscovery()
         }
     }
 
-    if (ms - lastTSAutoDiscovery > 5000 || lastTSAutoDiscovery == 0)
+    if (!_motor->isMoving() && !ms - lastTSAutoDiscovery > 5000 || lastTSAutoDiscovery == 0)
     {
         lastTSAutoDiscovery = ms;
 
@@ -215,10 +215,6 @@ void Peripherals_AF3::handleHC()
 
 void Peripherals_AF3::handleTS()
 {
-    static unsigned long lastRun = 0;
-    static float tempC;
-    static float tempF;
-
     if (_tsConnected)
     {
         if (millis() - lastRun < 5000)
@@ -247,8 +243,7 @@ void Peripherals_AF3::handleTS()
 
 float Peripherals_AF3::getTempCBy() 
 {
-    _sensors.requestTemperatures();
-    return _sensors.getTempCByIndex(0);
+    return tempC;
 }
 
 int Peripherals_AF3::readHcPin() {

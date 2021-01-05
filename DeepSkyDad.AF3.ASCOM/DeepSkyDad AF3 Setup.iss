@@ -9,20 +9,20 @@
 ;4. Enter command "signtool.exe sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /a $p" 
 ;SignTool=MsSign $f
 AppID={{13d23dd8-c0a2-495f-a9a2-b2573c231e0e}
-AppName=ASCOM DSD AF3 v1.0.2
-AppVerName=ASCOM DSD AF3 v1.0.2
-AppVersion=1.0.2
+AppName=ASCOM DSD AF3 v1.0.3
+AppVerName=ASCOM DSD AF3 v1.0.3
+AppVersion=1.0.3
 AppPublisher=Pavle Gartner <pavle.gartner@gmail.com>
 AppPublisherURL=mailto:pavle.gartner@gmail.com
 AppSupportURL=http://tech.groups.yahoo.com/group/ASCOM-Talk/
 AppUpdatesURL=http://ascom-standards.org/
-VersionInfoVersion=1.0.2
+VersionInfoVersion=1.0.3
 MinVersion=0,5.0.2195sp4
 DefaultDirName="{cf}\ASCOM\Focuser"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir="."
-OutputBaseFilename="ASCOM DSD AF3 Setup v1.0.2"
+OutputBaseFilename="ASCOM DSD AF3 Setup v1.0.3"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
