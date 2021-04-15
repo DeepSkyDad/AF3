@@ -25,9 +25,17 @@ void EEPROM_AF3::_readEeprom()
     bool found = false;
     for (int i = 0; i < _slidingAddressCount; i++)
     {
+        /*Serial.print("EEPROM address ");
+        Serial.print(address);
+        Serial.print(" checksum: ");*/
+
         eeprom_read_block((void *)&_state.position, (const void *)address, sizeof(_state.position)); address+=sizeof(_state.position);
         eeprom_read_block((void *)&_state.targetPosition, (const void *)address, sizeof(_state.targetPosition)); address+=sizeof(_state.targetPosition);
         eeprom_read_block((void *)&_state.checksum, (const void *)address, sizeof(_state.checksum)); address+=sizeof(_state.checksum);
+
+        /*Serial.print(_state.checksum);
+        Serial.print(", calculated: ");
+        Serial.println(_calculateChecksum(_state));*/
 
         if (_state.checksum == _calculateChecksum(_state))
         {
@@ -39,13 +47,13 @@ void EEPROM_AF3::_readEeprom()
 
     if (!found)
     {
+        //Serial.println("RESET");
         _resetEeprom();
     }
 }
 
 void EEPROM_AF3::_writeEeprom(bool isReset)
 {
-
     _lastEepromCheckMs = millis();
     _isConfigDirty = false;
     _lastPositionChangeMs = 0L;
@@ -56,16 +64,18 @@ void EEPROM_AF3::_writeEeprom(bool isReset)
     int address = 0;
 
     //write configuration
-    eeprom_update_block((void *)&_state.maxPosition, (void *)address, sizeof(_state.maxPosition)); address+=sizeof(_state.maxPosition);
-    eeprom_update_block((void *)&_state.maxMovement, (void *)address, sizeof(_state.maxMovement)); address+=sizeof(_state.maxMovement);
-    eeprom_update_block((void *)&_state.stepMode, (void *)address, sizeof(_state.stepMode)); address+=sizeof(_state.stepMode);
-    eeprom_update_block((void *)&_state.stepModeManual, (void *)address, sizeof(_state.stepModeManual)); address+=sizeof(_state.stepModeManual);
-    eeprom_update_block((void *)&_state.speedMode, (void *)address, sizeof(_state.speedMode)); address+=sizeof(_state.speedMode);
-    eeprom_update_block((void *)&_state.settleBufferMs, (void *)address, sizeof(_state.settleBufferMs)); address+=sizeof(_state.settleBufferMs);
-    eeprom_update_block((void *)&_state.idleEepromWriteMs, (void *)address, sizeof(_state.idleEepromWriteMs)); address+=sizeof(_state.idleEepromWriteMs);
-    eeprom_update_block((void *)&_state.reverseDirection, (void *)address, sizeof(_state.reverseDirection)); address+=sizeof(_state.reverseDirection);
-    eeprom_update_block((void *)&_state.motorIMoveMultiplier, (void *)address, sizeof(_state.motorIMoveMultiplier)); address+=sizeof(_state.motorIMoveMultiplier);
-    eeprom_update_block((void *)&_state.motorIHoldMultiplier, (void *)address, sizeof(_state.motorIHoldMultiplier)); address+=sizeof(_state.motorIHoldMultiplier);
+    eeprom_update_block((void *)&_state.maxPosition, (void *)address, sizeof(_state.maxPosition)); address+=sizeof(_state.maxPosition); delay(1);
+    eeprom_update_block((void *)&_state.maxMovement, (void *)address, sizeof(_state.maxMovement)); address+=sizeof(_state.maxMovement); delay(1);
+    eeprom_update_block((void *)&_state.stepMode, (void *)address, sizeof(_state.stepMode)); address+=sizeof(_state.stepMode); delay(1);
+    eeprom_update_block((void *)&_state.stepModeManual, (void *)address, sizeof(_state.stepModeManual)); address+=sizeof(_state.stepModeManual); delay(1);
+    eeprom_update_block((void *)&_state.speedMode, (void *)address, sizeof(_state.speedMode)); address+=sizeof(_state.speedMode); delay(1);
+    eeprom_update_block((void *)&_state.settleBufferMs, (void *)address, sizeof(_state.settleBufferMs)); address+=sizeof(_state.settleBufferMs); delay(1);
+    eeprom_update_block((void *)&_state.idleEepromWriteMs, (void *)address, sizeof(_state.idleEepromWriteMs)); address+=sizeof(_state.idleEepromWriteMs); delay(1);
+    eeprom_update_block((void *)&_state.reverseDirection, (void *)address, sizeof(_state.reverseDirection)); address+=sizeof(_state.reverseDirection); delay(1);
+    eeprom_update_block((void *)&_state.motorIMoveMultiplier, (void *)address, sizeof(_state.motorIMoveMultiplier)); address+=sizeof(_state.motorIMoveMultiplier); delay(1);
+    eeprom_update_block((void *)&_state.motorIHoldMultiplier, (void *)address, sizeof(_state.motorIHoldMultiplier)); address+=sizeof(_state.motorIHoldMultiplier); delay(1);
+
+    delay(10);
 
     if (isReset)
     {
@@ -75,16 +85,18 @@ void EEPROM_AF3::_writeEeprom(bool isReset)
     {
         unsigned long storedPosition, storedTargetPosition, storedChecksum;
         address = _slidingCurrentAddress;
-        eeprom_read_block((void *)&storedPosition, (const void *)address, sizeof(storedPosition)); address+=sizeof(storedPosition);
-        eeprom_read_block((void *)&storedTargetPosition, (const void *)address, sizeof(storedTargetPosition)); address+=sizeof(storedTargetPosition);
-        eeprom_read_block((void *)&storedChecksum, (const void *)address, sizeof(storedChecksum)); address+=sizeof(storedChecksum);
+        eeprom_read_block((void *)&storedPosition, (const void *)address, sizeof(storedPosition)); address+=sizeof(storedPosition); delay(1);
+        eeprom_read_block((void *)&storedTargetPosition, (const void *)address, sizeof(storedTargetPosition)); address+=sizeof(storedTargetPosition); delay(1);
+        eeprom_read_block((void *)&storedChecksum, (const void *)address, sizeof(storedChecksum)); address+=sizeof(storedChecksum); delay(1);
+
+        delay(10);
 
         if (storedPosition != _state.position || storedTargetPosition != _state.targetPosition || storedChecksum != _state.checksum)
         {
             //invalidate previous sliding state checksum
             address = _slidingCurrentAddress + _slidingSize - sizeof(_state.checksum);
-            unsigned long invalidChecksum = 0;
-            eeprom_update_block((void *)&invalidChecksum, (void *)address, sizeof(invalidChecksum)); address+=sizeof(invalidChecksum);
+            unsigned long invalidChecksum = 99999999999;
+            eeprom_update_block((void *)&invalidChecksum, (void *)address, sizeof(invalidChecksum)); address+=sizeof(invalidChecksum); delay(1);
 
 
             //slide address for position, target position, checksum
@@ -97,9 +109,12 @@ void EEPROM_AF3::_writeEeprom(bool isReset)
     }
 
     address = _slidingCurrentAddress;
-    eeprom_update_block((void *)&_state.position, (void *)address, sizeof(_state.position)); address+=sizeof(_state.position);
-    eeprom_update_block((void *)&_state.targetPosition, (void *)address, sizeof(_state.targetPosition)); address+=sizeof(_state.targetPosition);
-    eeprom_update_block((void *)&_state.checksum, (void *)address, sizeof(_state.checksum)); address+=sizeof(_state.checksum);
+
+    delay(10);
+
+    eeprom_update_block((void *)&_state.position, (void *)address, sizeof(_state.position)); address+=sizeof(_state.position); delay(1);
+    eeprom_update_block((void *)&_state.targetPosition, (void *)address, sizeof(_state.targetPosition)); address+=sizeof(_state.targetPosition); delay(1);
+    eeprom_update_block((void *)&_state.checksum, (void *)address, sizeof(_state.checksum)); address+=sizeof(_state.checksum); delay(1);
 }
 
 void EEPROM_AF3::_resetEeprom()

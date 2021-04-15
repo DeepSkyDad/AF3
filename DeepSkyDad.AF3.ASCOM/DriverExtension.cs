@@ -124,11 +124,24 @@ namespace ASCOM.DeepSkyDad.AF3
 
                     if (response.StartsWith("!"))
                     {
-                        if(response.Contains("999"))
+                        //handle unknown command response - try to resend (in case of some problem with serial communication)
+                        if (response == "!100)")
+                        {
+                            tl.LogMessage("CommandString sync", $"Response for {command} received: {response} (UNKNOWN COMMAND) -> retry");
+                            Thread.Sleep(100);
+                            serial.ClearBuffers();
+                            Thread.Sleep(50);
+                            serial.Transmit(command);
+                            response = serial.ReceiveTerminated(")");
+                            if (response.StartsWith("!"))
+                                throw new ASCOM.DriverException($"Command failed, response: {response}");
+                        }
+
+                        if (response == "!999)")
+                        {
                             throw new ASCOM.DriverException($"Motor initialization failed. Please check the 12V power cable and try again");
-                        throw new ApplicationException($"Command failed, response: {response}");
+                        }  
                     }
-                        
 
                     tls.LogMessage("Response", response);
                     tl.LogMessage("CommandString sync", $"Response for {command} received: {response}");

@@ -23,6 +23,41 @@ namespace ASCOM.DeepSkyDad.AF3
             InitUI();
         }
 
+        private bool _executeCommand(Action action)
+        {
+            var isPreconnected = _f.Connected;
+
+            var comPort = (string)comboBoxComPort.SelectedItem;
+            if (string.IsNullOrWhiteSpace(comPort))
+            {
+                MessageBox.Show("Please select COM port", "Error");
+                return false;
+            }
+
+            try
+            {
+                if (!isPreconnected)
+                {
+                    FocuserTemplate.comPort = comPort;
+                    _f.Connected = true;
+                }
+
+                action();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Command failed ({ex.Message})", "Error");
+                return false;
+            }
+            finally
+            {
+                if (_f.Connected && !isPreconnected)
+                    _f.Disconnect();
+            }
+        }
+
         private void cmdOK_Click(object sender, EventArgs e) // OK button event handler
         {
             // Place any validation constraint checks here
@@ -126,21 +161,8 @@ namespace ASCOM.DeepSkyDad.AF3
 
         private void buttonFirmwareInfo_Click(object sender, EventArgs e)
         {
-            var comPort = (string)comboBoxComPort.SelectedItem;
-            if (string.IsNullOrWhiteSpace(comPort))
-            {
-                MessageBox.Show("Please select COM port", "Error");
-                return;
-            }
-
-            try
-            {
-                ShowNonBlockingMessageBox($"Required: {_f.GetFirmwareVersion()}.X\r\nInstalled: {_f.GetInstalledFirmwareVersion()}", "Firmware version");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Firmware version check failed ({ex.Message})", "Error");
-            }
+            var action = new Action(delegate { ShowNonBlockingMessageBox($"Required: {_f.GetFirmwareVersion()}.X\r\nInstalled: {_f.GetInstalledFirmwareVersion()}", "Firmware version"); });
+            _executeCommand(action);
         }
 
         private void ShowNonBlockingMessageBox(string text, string caption)
@@ -161,30 +183,9 @@ namespace ASCOM.DeepSkyDad.AF3
 
         private void buttonReboot_Click(object sender, EventArgs e)
         {
-            var comPort = (string)comboBoxComPort.SelectedItem;
-            if (string.IsNullOrWhiteSpace(comPort))
-            {
-                MessageBox.Show("Please select COM port", "Error");
-                return;
-            }
-
-            try
-            {
-                FocuserTemplate.comPort = comPort;
-                _f.Connected = true;
-                _f.CommandBlind("RBOT");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Connection to the focuser failed ({ex.Message})", "Error");
-            }
-            finally
-            {
-                if (_f.Connected)
-                    _f.Disconnect();
-            }
-
-            MessageBox.Show("Reboot successful!");
+            var action = new Action(delegate { _f.CommandBlind("RBOT"); });
+            if(_executeCommand(action))
+                MessageBox.Show("Reboot successful!");
         }
 
         private void showAdvancedBtn_Click(object sender, EventArgs e)

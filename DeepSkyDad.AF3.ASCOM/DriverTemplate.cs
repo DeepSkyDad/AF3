@@ -183,34 +183,7 @@ namespace ASCOM.DeepSkyDad.AF3
 
         public string GetInstalledFirmwareVersion()
         {
-            if (Connected)
-                return CommandString("GFRM");
-
-            serial = new Serial();
-            serial.Speed = SerialSpeed.ps9600;
-            serial.PortName = comPort;
-            serial.DTREnable = false;
-            //serial.Handshake = SerialHandshake.None;
-            serial.Connected = true;
-            serial.ReceiveTimeoutMs = commandTimeout;
-            //serial.ReceiveTerminated("(READY)"); //wait for ready signal - this is needed because arduino auto-resets when serial connection is established to it (it can be prevented by putting capacitor between 5v and reset but not neccessary for autofocuser)
-
-            string actualBoard = string.Empty;
-            try
-            {
-                return CommandString("GFRM");
-            }
-            catch (Exception)
-            {
-                //retry
-                return CommandString("GFRM");
-            }
-            finally
-            {
-                serial.Connected = false;
-                serial.Dispose();
-                serial = null;
-            }
+            return CommandString("GFRM");
         }
 
 
