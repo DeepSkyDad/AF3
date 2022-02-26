@@ -95,7 +95,7 @@ void EEPROM_AF3::_writeEeprom(bool isReset)
         {
             //invalidate previous sliding state checksum
             address = _slidingCurrentAddress + _slidingSize - sizeof(_state.checksum);
-            unsigned long invalidChecksum = 99999999999;
+            unsigned long invalidChecksum = 99999999;
             eeprom_update_block((void *)&invalidChecksum, (void *)address, sizeof(invalidChecksum)); address+=sizeof(invalidChecksum); delay(1);
 
 

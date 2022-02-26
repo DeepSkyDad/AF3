@@ -16,7 +16,6 @@ namespace ASCOM.DeepSkyDad.AF3
         //for locking serial communication
         private Mutex serialMutex = null;
         private bool createdNew;
-        private bool hasHandle;
 
         private void CheckVersion()
         {
@@ -65,6 +64,8 @@ namespace ASCOM.DeepSkyDad.AF3
         /// <returns>response text, in case of empty command or async empty string</returns>
         private string CommandString(string command, bool raw, bool async)
         {
+            bool hasHandle = false;
+
             //init
             if (serialMutex == null)
             {
