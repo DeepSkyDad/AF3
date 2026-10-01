@@ -98,6 +98,16 @@ bool Motor_AF3::init(EEPROM_AF3 &eeprom, Peripherals_AF3 &peri)
 
     _driver.begin();
 
+    const uint32_t driverInputs = _driver.IOIN();
+    if(_driver.CRCerror || driverInputs == 0)
+        return false;
+
+    if((driverInputs >> 24) == 0x21) { //TMC2209 (TMC2208 version is 0x20)
+        //SPREAD pin (IOIN bit 8) inverts en_spreadCycle on TMC2209.
+        _driver.en_spreadCycle((driverInputs & (1UL << 8)) != 0);
+        _driver.TPWMTHRS(0); //keep stealthChop enabled at all speeds
+    }
+
     /****** IMPORTANT - TMCStepper 0.6.2 lib overrides ********
 
     1. baudRate of SoftwareSerial for TMC2208 was reduced to 57600 due to Nano Every CRC issues on test_connection (DRV_STATUS) call (TMCS2208Stepper.cpp, beginSerial(57200)) 
